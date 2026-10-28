@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECN 241 Spooky Stats Jeopardy: Continuous Probability</title>
+    <style>
+        :root {
+            --spooky-dark: #0b0f19;
+            --spooky-purple: #1e1b4b;
+            --pumpkin-orange: #f97316;
+            --pumpkin-hover: #ea580c;
+            --ghost-white: #f8fafc;
+            --card-bg: #111827;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #374151;
+            --jeopardy-blue: #1d4ed8;
+            --jeopardy-gold: #facc15;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--spooky-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+            background-image: radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.05) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 80%, rgba(30, 27, 75, 0.4) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* GitHub Button in Upper Right */
+        .github-corner {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--pumpkin-orange);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+            transition: background-color 0.2s, transform 0.1s;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        .github-corner:hover {
+            background-color: var(--pumpkin-hover);
+            transform: translateY(-1px);
+        }
+
+        .github-corner svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            color: white;
+            padding: 25px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+            border: 2px solid var(--border);
+            border-bottom: 5px solid var(--pumpkin-orange);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative Spooky Web Corner Motif */
+        header::before {
+            content: "🕸️";
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 1.8rem;
+            opacity: 0.8;
+        }
+        header::after {
+            content: "🎃";
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.8rem;
+            opacity: 0.8;
+        }
+
+        header h1 {
+            margin: 0 0 5px 0;
+            font-size: 2.2rem;
+            letter-spacing: 0.5px;
+            color: var(--ghost-white);
+        }
+
+        header h2 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+            color: var(--pumpkin-orange);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        header p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Jeopardy Board Grid */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .category-header {
+            background-color: var(--spooky-purple);
+            color: var(--ghost-white);
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            border-bottom: 3px solid var(--pumpkin-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 55px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .tile {
+            background-color: var(--jeopardy-blue);
+            color: var(--jeopardy-gold);
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 25px 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            user-select: none;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tile:hover {
+            background-color: #2563eb;
+            transform: scale(1.03);
+            box-shadow: 0 6px 12px rgba(29, 78, 216, 0.4);
+        }
+
+        .tile.used {
+            background-color: #1f2937;
+            color: #4b5563;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            border: 1px solid #111827;
+        }
+
+        /* Modal Overlay */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(11, 15, 25, 0.88);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            padding: 35px;
+            border-radius: 12px;
+            max-width: 750px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid var(--border);
+            border-top: 8px solid var(--pumpkin-orange);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            animation: modalPop 0.2s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-category {
+            font-size: 1rem;
+            text-transform: uppercase;
+            color: var(--pumpkin-orange);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .modal-value {
+            font-size: 1.4rem;
+            color: var(--jeopardy-gold);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .modal-question {
+            font-size: 1.3rem;
+            color: var(--ghost-white);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .question-image {
+            max-width: 320px;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px auto 20px auto;
+            display: block;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .modal-answer-container {
+            display: none;
+            margin-bottom: 25px;
+            background: #1f2937;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .modal-answer-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+
+        .modal-answer {
+            font-size: 1.15rem;
+            color: #34d399;
+            font-weight: bold;
+        }
+
+        .modal-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            background-color: var(--pumpkin-orange);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--pumpkin-hover);
+            transform: translateY(-1px);
+        }
+
+        button.secondary {
+            background-color: #374151;
+            color: var(--ghost-white);
+        }
+        button.secondary:hover {
+            background-color: #4b5563;
+        }
+
+        @media (max-width: 768px) {
+            .board {
+                grid-template-columns: repeat(1, 1fr);
+            }
+            .tile {
+                font-size: 1.2rem;
+                padding: 15px;
+            }
+            .github-corner {
+                position: relative;
+                margin-bottom: 15px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="https://github.com/securemindorg/ECN-231-Statistics-Jepordy-MidSemester" target="_blank" class="github-corner">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub Repo
+    </a>
+
+    <header>
+        <h2>ECN 241: Continuous Probability Module</h2>
+        <h1>🎃 Spooky Stats Jeopardy 👻</h1>
+        <p>Utica University • Halloween Review Session</p>
+    </header>
+
+    <!-- Jeopardy Board -->
+    <div class="board" id="jeopardy-board">
+        <!-- Categories generated by JS -->
+    </div>
+</div>
+
+<!-- Question Modal -->
+<div class="modal" id="question-modal">
+    <div class="modal-content">
+        <div class="modal-category" id="m-category">Category</div>
+        <div class="modal-value" id="m-value">$100</div>
+        <div class="modal-question" id="m-question">Question text goes here...</div>
+        
+        <!-- Image Container for Visualizations -->
+        <div id="image-container"></div>
+
+        <div class="modal-answer-container" id="m-answer-container">
+            <div class="modal-answer-label">Correct Answer:</div>
+            <div class="modal-answer" id="m-answer">Answer text goes here...</div>
+        </div>
+
+        <div class="modal-controls">
+            <button id="btn-reveal" onclick="revealAnswer()">Show Answer</button>
+            <button class="secondary" onclick="closeModal()">Close / Return to Board</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Bulletproof Base64 Encoded SVG Data URIs for Visualizations (Spooky Theme Colors)
+    const normalCurveImg = "data:image/svg+xml;base64," + btoa(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150">' +
+        '<rect width="300" height="150" fill="#111827" rx="8"/>' +
+        '<path d="M 20 130 Q 100 130 130 50 Q 150 10 170 50 Q 200 130 280 130" fill="none" stroke="#f8fafc" stroke-width="3"/>' +
+        '<line x1="150" y1="20" x2="150" y2="130" stroke="#f97316" stroke-width="2" stroke-dasharray="4"/>' +
+        '<text x="110" y="40" font-family="sans-serif" font-size="11" fill="#f97316" font-weight="bold">Mean = Median = Mode</text>' +
+        '</svg>'
+    );
+
+    const rightSkewImg = "data:image/svg+xml;base64," + btoa(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150">' +
+        '<rect width="300" height="150" fill="#111827" rx="8"/>' +
+        '<path d="M 20 130 Q 70 130 90 70 Q 120 15 140 70 Q 200 130 280 130" fill="none" stroke="#f8fafc" stroke-width="3"/>' +
+        '<line x1="110" y1="35" x2="110" y2="130" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4"/>' +
+        '<line x1="140" y1="20" x2="140" y2="130" stroke="#f97316" stroke-width="2" stroke-dasharray="4"/>' +
+        '<text x="115" y="115" font-family="sans-serif" font-size="10" fill="#38bdf8" font-weight="bold">Median</text>' +
+        '<text x="145" y="95" font-family="sans-serif" font-size="10" fill="#f97316" font-weight="bold">Mean</text>' +
+        '</svg>'
+    );
+
+    const gameData = [
+        {
+            category: "Phantom PDFs",
+            questions: [
+                { value: 100, q: "What letter is commonly used to represent a Probability Density Function (PDF) for a continuous random variable?", a: "What is f(x)?" },
+                { value: 200, q: "The total area under any valid Probability Density Function (PDF) curve across its entire range must always equal this number.", a: "What is 1 (or 100%)?" },
+                { value: 300, q: "Unlike discrete distributions where an exact value has probability, for a continuous variable, the exact probability of any single point is equal to this.", a: "What is zero?" },
+                { value: 400, q: "To find the probability that a continuous random variable falls between points a and b, you must calculate this mathematical operation under the PDF curve.", a: "What is the integral (or area under the curve)?" },
+                { value: 500, q: "If the PDF of a continuous variable is flat and constant across an interval [a, b], it belongs to this specific distribution type.", a: "What is the Uniform distribution?" }
+            ]
+        },
+        {
+            category: "Z-Scores & Zombies",
+            questions: [
+                { value: 100, q: "In a standard normal distribution, this is always the numerical value of the mean (μ).", a: "What is 0?" },
+                { value: 200, q: "In a standard normal distribution, this is always the numerical value of the standard deviation (σ).", a: "What is 1?" },
+                { value: 300, q: "This standardized score tells you exactly how many standard deviations a spooky data point is away from the mean.", a: "What is a z-score?" },
+                { value: 400, q: "If a zombie's shuffle time has a z-score of +2.0, it means its time is this many standard deviations above the mean.", a: "What is 2 standard deviations above the mean?" },
+                { value: 500, q: "In Excel, this formula function is used to calculate the cumulative left-tail probability for a given z-score in a standard normal distribution.", a: "What is =NORM.S.DIST()?" }
+            ]
+        },
+        {
+            category: "Ghostly Graphs",
+            questions: [
+                { value: 100, q: "This classic symmetrical, bell-shaped continuous probability curve is named after Carl Friedrich Gauss.", a: "What is the normal distribution?" },
+                { 
+                    value: 200, 
+                    q: "If a continuous distribution has a long tail stretching out to the right (positive direction) like this graph, it is known by this term.", 
+                    a: "What is right-skewed (positively skewed)?",
+                    image: rightSkewImg
+                },
+                { value: 300, q: "For a perfectly symmetrical normal bell curve, these three measures of central tendency are all exactly equal.", a: "What are the mean, median, and mode?" },
+                { value: 400, q: "In a heavily right-skewed spooky dataset, this central tendency measure is typically pulled highest toward the tail.", a: "What is the mean?" },
+                { 
+                    value: 500, 
+                    q: "In a perfectly symmetrical distribution like this bell curve, the mean, median, and mode occupy this exact position.", 
+                    a: "What is the center peak?",
+                    image: normalCurveImg
+                }
+            ]
+        },
+        {
+            category: "Vampire Uniforms",
+            questions: [
+                { value: 100, q: "In a continuous uniform distribution bounded between a and b, the total length or width of the interval is calculated by doing this.", a: "What is b - a?" },
+                { value: 200, q: "The height (probability density) of a continuous uniform distribution over an interval [a, b] is always equal to this fraction.", a: "What is 1 / (b - a)?" },
+                { value: 300, q: "If a vampire's wait time in a coffin is uniformly distributed between 0 and 10 minutes, this is the probability they wait less than 5 minutes.", a: "What is 0.50 (or 50%)?" },
+                { value: 400, q: "The expected value (mean) of a continuous uniform distribution with lower bound a and upper bound b is found using this formula.", a: "What is (a + b) / 2?" },
+                { value: 500, q: "The variance of a continuous uniform distribution on the interval from a to b is given by this formula involving squared width.", a: "What is (b - a)^2 / 12?" }
+            ]
+        },
+        {
+            category: "Expectation & Werewolves",
+            questions: [
+                { value: 100, q: "For a continuous random variable, the expected value E(x) represents this physical concept of the distribution's balance point.", a: "What is the center of mass (or mean)?" },
+                { value: 200, q: "Instead of a summation symbol (Σ) used in discrete variables, continuous expected value uses this calculus tool.", a: "What is an integral (∫)?" },
+                { value: 300, q: "According to this famous statistical rule, roughly 95% of data in a normal distribution falls within ±2 standard deviations of the mean.", a: "What is the Empirical Rule (or 68-95-99.7 rule)?" },
+                { value: 400, q: "This continuous probability distribution is frequently used to model the waiting time or time between independent spooky events occurring at a constant rate.", a: "What is the Exponential distribution?" },
+                { value: 500, q: "In business analytics, running thousands of randomized continuous trials using uniform or normal random variables is known by this famous name.", a: "What is a Monte Carlo simulation?" }
+            ]
+        }
+    ];
+
+    const boardEl = document.getElementById('jeopardy-board');
+    const modalEl = document.getElementById('question-modal');
+    const mCategory = document.getElementById('m-category');
+    const mValue = document.getElementById('m-value');
+    const mQuestion = document.getElementById('m-question');
+    const imageContainer = document.getElementById('image-container');
+    const mAnswerContainer = document.getElementById('m-answer-container');
+    const mAnswer = document.getElementById('m-answer');
+    const btnReveal = document.getElementById('btn-reveal');
+
+    let currentTile = null;
+
+    function buildBoard() {
+        boardEl.innerHTML = '';
+        
+        gameData.forEach(col => {
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            header.innerText = col.category;
+            boardEl.appendChild(header);
+        });
+
+        for (let rowIndex = 0; rowIndex < 5; rowIndex++) {
+            gameData.forEach((col, colIndex) => {
+                const qData = col.questions[rowIndex];
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.innerText = `$${qData.value}`;
+                tile.dataset.col = colIndex;
+                tile.dataset.row = rowIndex;
+                
+                tile.onclick = () => openQuestion(colIndex, rowIndex, tile);
+                boardEl.appendChild(tile);
+            });
+        }
+    }
+
+    function openQuestion(colIndex, rowIndex, tile) {
+        if (tile.classList.contains('used')) return;
+
+        currentTile = tile;
+        const qData = gameData[colIndex].questions[rowIndex];
+
+        mCategory.innerText = gameData[colIndex].category;
+        mValue.innerText = `$${qData.value}`;
+        mQuestion.innerText = qData.q;
+        mAnswer.innerText = qData.a;
+        
+        // Render Base64 image reliably
+        if (qData.image) {
+            imageContainer.innerHTML = `<img src="${qData.image}" class="question-image" alt="Statistical Distribution Chart">`;
+            imageContainer.style.display = 'block';
+        } else {
+            imageContainer.innerHTML = '';
+            imageContainer.style.display = 'none';
+        }
+
+        mAnswerContainer.style.display = 'none';
+        btnReveal.style.display = 'inline-block';
+        modalEl.style.display = 'flex';
+    }
+
+    function revealAnswer() {
+        mAnswerContainer.style.display = 'block';
+        btnReveal.style.display = 'none';
+    }
+
+    function closeModal() {
+        modalEl.style.display = 'none';
+        if (currentTile) {
+            currentTile.classList.add('used');
+            currentTile.innerText = '—';
+        }
+    }
+
+    buildBoard();
+</script>
+
+</body>
+</html>
