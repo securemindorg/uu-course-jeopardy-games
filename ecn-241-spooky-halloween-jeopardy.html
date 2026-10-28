@@ -28,12 +28,54 @@
             line-height: 1.5;
             background-image: radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.05) 0%, transparent 40%),
                               radial-gradient(circle at 90% 80%, rgba(30, 27, 75, 0.4) 0%, transparent 50%);
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             position: relative;
+        }
+
+        /* Animated Spider Web Thread & Spider */
+        .spider-container {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            pointer-events: none;
+            animation: spiderDropLift 3.8s ease-in-out forwards;
+        }
+
+        .spider-thread {
+            width: 2px;
+            height: 220px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.3));
+            margin: 0 auto;
+            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+
+        .spider-svg {
+            width: 45px;
+            height: 45px;
+            margin-top: -2px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+        }
+
+        @keyframes spiderDropLift {
+            0% {
+                transform: translate(-50%, -240px);
+            }
+            35% {
+                transform: translate(-50%, 0px);
+            }
+            55% {
+                transform: translate(-50%, 0px);
+            }
+            100% {
+                transform: translate(-50%, -180px);
+            }
         }
 
         /* GitHub Button in Upper Right */
@@ -81,7 +123,6 @@
             overflow: hidden;
         }
 
-        /* Decorative Spooky Web Corner Motif */
         header::before {
             content: "🕸️";
             position: absolute;
@@ -316,6 +357,31 @@
     </style>
 </head>
 <body>
+
+<!-- Animated Spider Drop & Lift -->
+<div class="spider-container">
+    <div class="spider-thread"></div>
+    <svg class="spider-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <!-- Spider Body -->
+        <ellipse cx="50" cy="65" rx="18" ry="22" fill="#1e1e1e" stroke="#f97316" stroke-width="2"/>
+        <circle cx="50" cy="40" r="12" fill="#111111" stroke="#f97316" stroke-width="1.5"/>
+        <!-- Glowing Red/Orange Eyes -->
+        <circle cx="45" cy="38" r="2.5" fill="#f97316"/>
+        <circle cx="55" cy="38" r="2.5" fill="#f97316"/>
+        <circle cx="41" cy="43" r="1.5" fill="#f97316"/>
+        <circle cx="59" cy="43" r="1.5" fill="#f97316"/>
+        <!-- Left Legs -->
+        <path d="M 42 38 Q 20 20 10 35" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 40 42 Q 15 35 5 55" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 40 46 Q 15 55 8 75" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 42 50 Q 20 70 15 90" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Right Legs -->
+        <path d="M 58 38 Q 80 20 90 35" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 60 42 Q 85 35 95 55" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 60 46 Q 85 55 92 75" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 58 50 Q 80 70 85 90" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+    </svg>
+</div>
 
 <div class="container">
     <a href="https://github.com/securemindorg/ECN-231-Statistics-Jepordy-MidSemester" target="_blank" class="github-corner">
