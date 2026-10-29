@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MGT 325 Spooky Tech Jeopardy: Halloween Review</title>
+    <style>
+        :root {
+            --spooky-dark: #0b0f19;
+            --spooky-purple: #1e1b4b;
+            --pumpkin-orange: #f97316;
+            --pumpkin-hover: #ea580c;
+            --ghost-white: #f8fafc;
+            --card-bg: #111827;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #374151;
+            --jeopardy-blue: #1d4ed8;
+            --jeopardy-gold: #facc15;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--spooky-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+            background-image: radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.05) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 80%, rgba(30, 27, 75, 0.4) 0%, transparent 50%);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Animated Spider Web Thread & Spider */
+        .spider-container {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            pointer-events: none;
+            animation: spiderDropLift 3.8s ease-in-out forwards;
+        }
+
+        .spider-thread {
+            width: 2px;
+            height: 220px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.3));
+            margin: 0 auto;
+            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+
+        .spider-svg {
+            width: 45px;
+            height: 45px;
+            margin-top: -2px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+        }
+
+        @keyframes spiderDropLift {
+            0% {
+                transform: translate(-50%, -240px);
+            }
+            35% {
+                transform: translate(-50%, 0px);
+            }
+            55% {
+                transform: translate(-50%, 0px);
+            }
+            100% {
+                transform: translate(-50%, -180px);
+            }
+        }
+
+        /* GitHub Button in Upper Right */
+        .github-corner {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--pumpkin-orange);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+            transition: background-color 0.2s, transform 0.1s;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        .github-corner:hover {
+            background-color: var(--pumpkin-hover);
+            transform: translateY(-1px);
+        }
+
+        .github-corner svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            color: white;
+            padding: 25px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+            border: 2px solid var(--border);
+            border-bottom: 5px solid var(--pumpkin-orange);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "🕸️";
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 1.8rem;
+            opacity: 0.8;
+        }
+        header::after {
+            content: "🎃";
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.8rem;
+            opacity: 0.8;
+        }
+
+        header h1 {
+            margin: 0 0 5px 0;
+            font-size: 2.2rem;
+            letter-spacing: 0.5px;
+            color: var(--ghost-white);
+        }
+
+        header h2 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+            color: var(--pumpkin-orange);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        header p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Jeopardy Board Grid */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .category-header {
+            background-color: var(--spooky-purple);
+            color: var(--ghost-white);
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            border-bottom: 3px solid var(--pumpkin-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 55px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .tile {
+            background-color: var(--jeopardy-blue);
+            color: var(--jeopardy-gold);
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 25px 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            user-select: none;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tile:hover {
+            background-color: #2563eb;
+            transform: scale(1.03);
+            box-shadow: 0 6px 12px rgba(29, 78, 216, 0.4);
+        }
+
+        .tile.used {
+            background-color: #1f2937;
+            color: #4b5563;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            border: 1px solid #111827;
+        }
+
+        /* Modal Overlay */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(11, 15, 25, 0.88);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            padding: 35px;
+            border-radius: 12px;
+            max-width: 750px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid var(--border);
+            border-top: 8px solid var(--pumpkin-orange);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            animation: modalPop 0.2s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-category {
+            font-size: 1rem;
+            text-transform: uppercase;
+            color: var(--pumpkin-orange);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .modal-value {
+            font-size: 1.4rem;
+            color: var(--jeopardy-gold);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .modal-question {
+            font-size: 1.3rem;
+            color: var(--ghost-white);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .question-image {
+            max-width: 380px;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px auto 20px auto;
+            display: block;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .modal-answer-container {
+            display: none;
+            margin-bottom: 25px;
+            background: #1f2937;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .modal-answer-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+
+        .modal-answer {
+            font-size: 1.15rem;
+            color: #34d399;
+            font-weight: bold;
+        }
+
+        .modal-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            background-color: var(--pumpkin-orange);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--pumpkin-hover);
+            transform: translateY(-1px);
+        }
+
+        button.secondary {
+            background-color: #374151;
+            color: var(--ghost-white);
+        }
+        button.secondary:hover {
+            background-color: #4b5563;
+        }
+
+        @media (max-width: 768px) {
+            .board {
+                grid-template-columns: repeat(1, 1fr);
+            }
+            .tile {
+                font-size: 1.2rem;
+                padding: 15px;
+            }
+            .github-corner {
+                position: relative;
+                margin-bottom: 15px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Animated Spider Drop & Lift -->
+<div class="spider-container">
+    <div class="spider-thread"></div>
+    <svg class="spider-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="65" rx="18" ry="22" fill="#1e1e1e" stroke="#f97316" stroke-width="2"/>
+        <circle cx="50" cy="40" r="12" fill="#111111" stroke="#f97316" stroke-width="1.5"/>
+        <circle cx="45" cy="38" r="2.5" fill="#f97316"/>
+        <circle cx="55" cy="38" r="2.5" fill="#f97316"/>
+        <circle cx="41" cy="43" r="1.5" fill="#f97316"/>
+        <circle cx="59" cy="43" r="1.5" fill="#f97316"/>
+        <path d="M 42 38 Q 20 20 10 35" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 40 42 Q 15 35 5 55" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 40 46 Q 15 55 8 75" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 42 50 Q 20 70 15 90" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 58 38 Q 80 20 90 35" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 60 42 Q 85 35 95 55" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 60 46 Q 85 55 92 75" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 58 50 Q 80 70 85 90" fill="none" stroke="#1e1e1e" stroke-width="3.5" stroke-linecap="round"/>
+    </svg>
+</div>
+
+<div class="container">
+    <a href="https://github.com/securemindorg/MGT-325-Jeopardy" target="_blank" class="github-corner">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub Repo
+    </a>
+
+    <header>
+        <h2>MGT 325: Management of Technology</h2>
+        <h1>🎃 Spooky Tech Management Jeopardy 👻</h1>
+        <p>Utica University • Halloween Review Session</p>
+    </header>
+
+    <!-- Jeopardy Board -->
+    <div class="board" id="jeopardy-board">
+        <!-- Categories generated by JS -->
+    </div>
+</div>
+
+<!-- Question Modal -->
+<div class="modal" id="question-modal">
+    <div class="modal-content">
+        <div class="modal-category" id="m-category">Category</div>
+        <div class="modal-value" id="m-value">$100</div>
+        <div class="modal-question" id="m-question">Question text goes here...</div>
+        
+        <!-- Image Container for Visualizations -->
+        <div id="image-container"></div>
+
+        <div class="modal-answer-container" id="m-answer-container">
+            <div class="modal-answer-label">Correct Answer:</div>
+            <div class="modal-answer" id="m-answer">Answer text goes here...</div>
+        </div>
+
+        <div class="modal-controls">
+            <button id="btn-reveal" onclick="revealAnswer()">Show Answer</button>
+            <button class="secondary" onclick="closeModal()">Close / Return to Board</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Base64 Encoded SVG Visualizations (Spooky Theme Colors)
+    const netScaleImg = "data:image/svg+xml;base64," + btoa(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="360" height="150" viewBox="0 0 360 150">' +
+        '<rect width="360" height="150" fill="#111827" rx="8"/>' +
+        '<rect x="15" y="45" width="65" height="60" fill="#1e1b4b" stroke="#f97316" stroke-width="2" rx="6"/>' +
+        '<text x="47" y="80" font-family="sans-serif" font-size="14" fill="#f8fafc" font-weight="bold" text-anchor="middle">PAN</text>' +
+        '<rect x="95" y="45" width="65" height="60" fill="#1e1b4b" stroke="#f97316" stroke-width="2" rx="6"/>' +
+        '<text x="127" y="80" font-family="sans-serif" font-size="14" fill="#f8fafc" font-weight="bold" text-anchor="middle">LAN</text>' +
+        '<rect x="175" y="45" width="65" height="60" fill="#1e1b4b" stroke="#f97316" stroke-width="2" rx="6"/>' +
+        '<text x="207" y="80" font-family="sans-serif" font-size="14" fill="#f8fafc" font-weight="bold" text-anchor="middle">MAN</text>' +
+        '<rect x="255" y="45" width="85" height="60" fill="#f97316" stroke="#f8fafc" stroke-width="2" rx="6"/>' +
+        '<text x="297" y="80" font-family="sans-serif" font-size="14" fill="#111827" font-weight="bold" text-anchor="middle">WAN</text>' +
+        '<text x="180" y="25" font-family="sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Network Reach (Smallest to Largest Geographic Area)</text>' +
+        '</svg>'
+    );
+
+    const dataMiningImg = "data:image/svg+xml;base64," + btoa(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="360" height="150" viewBox="0 0 360 150">' +
+        '<rect width="360" height="150" fill="#111827" rx="8"/>' +
+        '<circle cx="80" cy="75" r="40" fill="#1e1b4b" stroke="#f97316" stroke-width="2"/>' +
+        '<text x="80" y="70" font-family="sans-serif" font-size="10" fill="#38bdf8" text-anchor="middle">Raw Spooky</text>' +
+        '<text x="80" y="85" font-family="sans-serif" font-size="10" fill="#38bdf8" text-anchor="middle">Data Lake</text>' +
+        '<path d="M 130 75 L 210 75" stroke="#f97316" stroke-width="3" marker-end="url(#arrow)"/>' +
+        '<text x="170" y="65" font-family="sans-serif" font-size="10" fill="#facc15" text-anchor="middle">Algorithms & AI</text>' +
+        '<rect x="230" y="45" width="100" height="60" fill="#f97316" rx="6"/>' +
+        '<text x="280" y="70" font-family="sans-serif" font-size="11" fill="#111827" font-weight="bold" text-anchor="middle">Actionable</text>' +
+        '<text x="280" y="85" font-family="sans-serif" font-size="11" fill="#111827" font-weight="bold" text-anchor="middle">Business Insights</text>' +
+        '</svg>'
+    );
+
+    const gameData = [
+        {
+            category: "Haunted Networks (PAN/LAN/MAN/WAN)",
+            questions: [
+                { value: 100, q: "This personal network scale covers a few meters around a single user, frequently connecting smartwatches, earbuds, or a vampire's Bluetooth heart monitor.", a: "What is a PAN (Personal Area Network)?" },
+                { value: 200, q: "Connecting computers within a single building or room, this network type powers university computer labs and haunted office spaces.", a: "What is a LAN (Local Area Network)?" },
+                { value: 300, q: "Spanning across an entire city or large metropolitan region, this network scale links municipal infrastructure and regional business branches.", a: "What is a MAN (Metropolitan Area Network)?" },
+                { 
+                    value: 400, 
+                    q: "Connecting distant regions across countries or oceans, this largest network scale—as shown at the end of this range—forms the backbone of the global internet.", 
+                    a: "What is a WAN (Wide Area Network)?",
+                    image: netScaleImg
+                },
+                { value: 500, q: "This resilient network topology allows communication to 'hop' wirelessly from node to node, allowing ghost network traffic to reroute around blocked or failing paths.", a: "What is a Mesh Network?" }
+            ]
+        },
+        {
+            category: "Data Mining Crypts",
+            questions: [
+                { value: 100, q: "This core business intelligence practice involves extracting hidden patterns, anomalies, and correlations from massive datasets to predict future behavior.", a: "What is Data Mining?" },
+                { 
+                    value: 200, 
+                    q: "As depicted in this pipeline, data mining turns raw, unstructured enterprise storage into this valuable output for executive decision-makers.", 
+                    a: "What are Actionable Business Insights (or Business Intelligence / Value)?",
+                    image: dataMiningImg
+                },
+                { value: 300, q: "A classic data mining technique used by online retailers (like Amazon) to discover products frequently purchased together—often called 'Market Basket Analysis'.", a: "What is Association Rule Mining (or Affinity Analysis)?" },
+                { value: 400, q: "This data mining method groups similar customer profiles into distinct clusters without prior labeling, allowing targeted marketing to zombie consumers.", a: "What is Cluster Analysis (or Unsupervised Clustering)?" },
+                { value: 500, q: "The five V's of big data include Volume, Velocity, Variety, Value, and this fifth V representing data quality, accuracy, and trustworthiness.", a: "What is Veracity?" }
+            ]
+        },
+        {
+            category: "Ghost in the Machine (IS Strategy)",
+            questions: [
+                { value: 100, q: "This foundational framework consists of People, Technology, Processes, and Structure, showing that technology alone is not an information system.", a: "What is Leavitt's Diamond?" },
+                { value: 200, q: "Michael Porter’s model that identifies primary and support activities where an enterprise can leverage IS to gain competitive advantage.", a: "What is the Value Chain?" },
+                { value: 300, q: "Hardware, software, or cloud applications deployed by employees without explicit IT department approval or cybersecurity oversight.", a: "What is Shadow IT?" },
+                { value: 400, q: "The three primary strategic avenues for enterprise competitive advantage are cost leadership, focus, and this unique positioning.", a: "What is Differentiation?" },
+                { value: 500, q: "This C-suite leader is responsible for aligning information technology strategy with overall enterprise goals and business growth.", a: "Who is the Chief Information Officer (CIO)?" }
+            ]
+        },
+        {
+            category: "Cybersecurity Cobwebs",
+            questions: [
+                { value: 100, q: "The core security triad consists of Confidentiality, Integrity, and this third principle ensuring systems and data remain accessible when needed.", a: "What is Availability?" },
+                { value: 200, q: "Specialized malicious software that encrypts enterprise data files and demands extortion payments in exchange for decryption keys.", a: "What is Ransomware?" },
+                { value: 300, q: "In the AAA security framework, Authentication asks 'Who are you?', Authorization asks 'What can you do?', and Accounting tracks this.", a: "What is 'What did you do?' (or tracking user actions and audit logs)" },
+                { value: 400, q: "A fraudulent technique where attackers pose as trustworthy entities via email or message to trick users into revealing sensitive credentials.", a: "What is Phishing?" },
+                { value: 500, q: "The governance framework defining roles, policies, and ownership to ensure organizational data is accurate, trusted, and protected enterprise-wide.", a: "What is Data Governance?" }
+            ]
+        },
+        {
+            category: "Witchy Web & Cloud",
+            questions: [
+                { value: 100, q: "A cloud computing model where businesses subscribe to web-delivered application software hosted centrally by a vendor.", a: "What is SaaS (Software as a Service)?" },
+                { value: 200, q: "An internal, private corporate network constructed using internet protocols, restricted exclusively to authorized enterprise employees.", a: "What is an Intranet?" },
+                { value: 300, q: "This British scientist invented the World Wide Web in 1989 while working at CERN, originally to share research documents.", a: "Who is Sir Tim Berners-Lee?" },
+                { value: 400, q: "A 'store everything' big data repository that retains all enterprise data in its raw, unstructured form until needed for analysis.", a: "What is a Data Lake?" },
+                { value: 500, q: "A secure, climate-controlled physical facility hosting the servers, networking gear, and storage devices that deliver cloud services.", a: "What is a Data Center?" }
+            ]
+        }
+    ];
+
+    const boardEl = document.getElementById('jeopardy-board');
+    const modalEl = document.getElementById('question-modal');
+    const mCategory = document.getElementById('m-category');
+    const mValue = document.getElementById('m-value');
+    const mQuestion = document.getElementById('m-question');
+    const imageContainer = document.getElementById('image-container');
+    const mAnswerContainer = document.getElementById('m-answer-container');
+    const mAnswer = document.getElementById('m-answer');
+    const btnReveal = document.getElementById('btn-reveal');
+
+    let currentTile = null;
+
+    function buildBoard() {
+        boardEl.innerHTML = '';
+        
+        gameData.forEach(col => {
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            header.innerText = col.category;
+            boardEl.appendChild(header);
+        });
+
+        for (let rowIndex = 0; rowIndex < 5; rowIndex++) {
+            gameData.forEach((col, colIndex) => {
+                const qData = col.questions[rowIndex];
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.innerText = `$${qData.value}`;
+                tile.dataset.col = colIndex;
+                tile.dataset.row = rowIndex;
+                
+                tile.onclick = () => openQuestion(colIndex, rowIndex, tile);
+                boardEl.appendChild(tile);
+            });
+        }
+    }
+
+    function openQuestion(colIndex, rowIndex, tile) {
+        if (tile.classList.contains('used')) return;
+
+        currentTile = tile;
+        const qData = gameData[colIndex].questions[rowIndex];
+
+        mCategory.innerText = gameData[colIndex].category;
+        mValue.innerText = `$${qData.value}`;
+        mQuestion.innerText = qData.q;
+        mAnswer.innerText = qData.a;
+        
+        if (qData.image) {
+            imageContainer.innerHTML = `<img src="${qData.image}" class="question-image" alt="Technical Diagram">`;
+            imageContainer.style.display = 'block';
+        } else {
+            imageContainer.innerHTML = '';
+            imageContainer.style.display = 'none';
+        }
+
+        mAnswerContainer.style.display = 'none';
+        btnReveal.style.display = 'inline-block';
+        modalEl.style.display = 'flex';
+    }
+
+    function revealAnswer() {
+        mAnswerContainer.style.display = 'block';
+        btnReveal.style.display = 'none';
+    }
+
+    function closeModal() {
+        modalEl.style.display = 'none';
+        if (currentTile) {
+            currentTile.classList.add('used');
+            currentTile.innerText = '—';
+        }
+    }
+
+    buildBoard();
+</script>
+
+</body>
+</html>
