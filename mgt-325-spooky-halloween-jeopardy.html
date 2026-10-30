@@ -17,6 +17,8 @@
             --border: #374151;
             --jeopardy-blue: #1d4ed8;
             --jeopardy-gold: #facc15;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
         }
 
         body {
@@ -282,7 +284,7 @@
             display: none;
             margin-bottom: 25px;
             background: #1f2937;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             border: 1px solid var(--border);
         }
@@ -299,6 +301,55 @@
             font-size: 1.15rem;
             color: #34d399;
             font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Award Points Section in Modal */
+        .award-section {
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+
+        .award-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--pumpkin-orange);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .award-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-award {
+            background-color: var(--spooky-purple);
+            color: var(--ghost-white);
+            border: 1px solid var(--pumpkin-orange);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-award:hover {
+            background-color: var(--pumpkin-orange);
+            transform: translateY(-1px);
+        }
+
+        .btn-award-none {
+            background-color: #374151;
+            border: 1px solid var(--border);
+        }
+
+        .btn-award-none:hover {
+            background-color: #4b5563;
         }
 
         .modal-controls {
@@ -332,10 +383,136 @@
             background-color: #4b5563;
         }
 
+        /* Team Scoreboard Section */
+        .scoreboard-section {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border);
+            border-top: 5px solid var(--pumpkin-orange);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        }
+
+        .scoreboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .scoreboard-header h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            color: var(--pumpkin-orange);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scoreboard-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .team-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .team-input-group input {
+            flex: 1;
+            background-color: #1f2937;
+            border: 1px solid var(--border);
+            color: var(--ghost-white);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .team-input-group input:focus {
+            border-color: var(--pumpkin-orange);
+        }
+
+        .team-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .team-card {
+            background-color: #1f2937;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .team-card:hover {
+            border-color: var(--pumpkin-orange);
+        }
+
+        .team-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--ghost-white);
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .team-score {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--jeopardy-gold);
+            margin-bottom: 12px;
+        }
+
+        .score-adjust-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-adjust {
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            background-color: #374151;
+        }
+
+        .btn-adjust:hover {
+            background-color: #4b5563;
+        }
+
+        .btn-delete-team {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 2px 6px;
+        }
+
+        .btn-delete-team:hover {
+            color: var(--danger-red);
+            background: none;
+        }
+
         @media (max-width: 768px) {
             .board { grid-template-columns: repeat(1, 1fr); }
             .tile { font-size: 1.2rem; padding: 15px; }
             .github-corner { position: relative; margin-bottom: 15px; justify-content: center; }
+            .team-input-group { flex-direction: column; }
         }
     </style>
 </head>
@@ -371,19 +548,50 @@
         <p>Utica University • Halloween Review Session</p>
     </header>
 
+    <!-- Jeopardy Board -->
     <div class="board" id="jeopardy-board"></div>
+
+    <!-- Team Scoreboard Section -->
+    <div class="scoreboard-section">
+        <div class="scoreboard-header">
+            <h2>🏆 Team Scoreboard</h2>
+            <div class="scoreboard-controls">
+                <button class="secondary" onclick="resetScores()">Reset Scores</button>
+            </div>
+        </div>
+
+        <div class="team-input-group">
+            <input type="text" id="new-team-name" placeholder="Enter team name (e.g. Cyber Ghouls)..." onkeydown="if(event.key==='Enter') addTeam()">
+            <button onclick="addTeam()">+ Add Team</button>
+        </div>
+
+        <div class="team-cards-grid" id="team-cards-container">
+            <!-- Dynamic Team Cards Go Here -->
+        </div>
+    </div>
 </div>
 
+<!-- Question Modal -->
 <div class="modal" id="question-modal">
     <div class="modal-content">
         <div class="modal-category" id="m-category">Category</div>
         <div class="modal-value" id="m-value">$100</div>
         <div class="modal-question" id="m-question">Question text goes here...</div>
+        
         <div id="image-container"></div>
+
         <div class="modal-answer-container" id="m-answer-container">
             <div class="modal-answer-label">Correct Answer:</div>
             <div class="modal-answer" id="m-answer">Answer text goes here...</div>
+            
+            <div class="award-section">
+                <div class="award-title">Award Points To:</div>
+                <div class="award-buttons" id="m-award-buttons">
+                    <!-- Dynamic Team Award Buttons Go Here -->
+                </div>
+            </div>
         </div>
+
         <div class="modal-controls">
             <button id="btn-reveal" onclick="revealAnswer()">Show Answer</button>
             <button class="secondary" onclick="closeModal()">Close / Return to Board</button>
@@ -417,7 +625,7 @@
         '<circle cx="70" cy="75" r="45" fill="none" stroke="#f97316" stroke-width="2" stroke-dasharray="4"/>' +
         '<text x="70" y="70" font-family="sans-serif" font-size="11" fill="#f97316" text-anchor="middle" font-weight="bold">PAN / LAN</text>' +
         '<text x="70" y="85" font-family="sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Personal / Local</text>' +
-        '<path d="M 115 75 L 185 75" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>' +
+        '<path d="M 115 75 L 185 75" stroke="#38bdf8" stroke-width="2"/>' +
         '<circle cx="230" cy="75" r="45" fill="none" stroke="#34d399" stroke-width="2"/>' +
         '<text x="230" y="70" font-family="sans-serif" font-size="11" fill="#34d399" text-anchor="middle" font-weight="bold">MAN / WAN</text>' +
         '<text x="230" y="85" font-family="sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Metro / Global</text>' +
@@ -482,6 +690,14 @@
         }
     ];
 
+    // State Management
+    let teams = JSON.parse(localStorage.getItem('spooky_jeopardy_teams')) || [
+        { name: "Team Vampires", score: 0 },
+        { name: "Team Werewolves", score: 0 }
+    ];
+    let currentTile = null;
+    let currentQuestionValue = 0;
+
     const boardEl = document.getElementById('jeopardy-board');
     const modalEl = document.getElementById('question-modal');
     const mCategory = document.getElementById('m-category');
@@ -491,8 +707,69 @@
     const mAnswerContainer = document.getElementById('m-answer-container');
     const mAnswer = document.getElementById('m-answer');
     const btnReveal = document.getElementById('btn-reveal');
+    const mAwardButtons = document.getElementById('m-award-buttons');
+    const teamCardsContainer = document.getElementById('team-cards-container');
 
-    let currentTile = null;
+    function saveTeams() {
+        localStorage.setItem('spooky_jeopardy_teams', JSON.stringify(teams));
+    }
+
+    function renderScoreboard() {
+        teamCardsContainer.innerHTML = '';
+        if (teams.length === 0) {
+            teamCardsContainer.innerHTML = `<div style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 15px;">No teams added yet. Add a team above to start tracking scores!</div>`;
+            return;
+        }
+
+        teams.forEach((team, index) => {
+            const card = document.createElement('div');
+            card.className = 'team-card';
+            card.innerHTML = `
+                <button class="btn-delete-team" onclick="deleteTeam(${index})" title="Remove Team">✕</button>
+                <div class="team-name">${escapeHtml(team.name)}</div>
+                <div class="team-score">$${team.score}</div>
+                <div class="score-adjust-buttons">
+                    <button class="btn-adjust" onclick="adjustScore(${index}, -100)">-$100</button>
+                    <button class="btn-adjust" onclick="adjustScore(${index}, 100)">+$100</button>
+                </div>
+            `;
+            teamCardsContainer.appendChild(card);
+        });
+    }
+
+    function addTeam() {
+        const input = document.getElementById('new-team-name');
+        const name = input.value.trim();
+        if (!name) return;
+        teams.push({ name, score: 0 });
+        input.value = '';
+        saveTeams();
+        renderScoreboard();
+    }
+
+    function deleteTeam(index) {
+        teams.splice(index, 1);
+        saveTeams();
+        renderScoreboard();
+    }
+
+    function adjustScore(index, delta) {
+        teams[index].score += delta;
+        saveTeams();
+        renderScoreboard();
+    }
+
+    function resetScores() {
+        if (confirm("Are you sure you want to reset all team scores to $0?")) {
+            teams.forEach(t => t.score = 0);
+            saveTeams();
+            renderScoreboard();
+        }
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
 
     function buildBoard() {
         boardEl.innerHTML = '';
@@ -522,6 +799,7 @@
 
         currentTile = tile;
         const qData = gameData[colIndex].questions[rowIndex];
+        currentQuestionValue = qData.value;
 
         mCategory.innerText = gameData[colIndex].category;
         mValue.innerText = `$${qData.value}`;
@@ -529,7 +807,7 @@
         mAnswer.innerText = qData.a;
         
         if (qData.image) {
-            imageContainer.innerHTML = `<img src="${qData.image}" class="question-image" alt="Data Mining Diagram">`;
+            imageContainer.innerHTML = `<img src="${qData.image}" class="question-image" alt="Diagram">`;
             imageContainer.style.display = 'block';
         } else {
             imageContainer.innerHTML = '';
@@ -544,6 +822,34 @@
     function revealAnswer() {
         mAnswerContainer.style.display = 'block';
         btnReveal.style.display = 'none';
+        renderModalAwardButtons();
+    }
+
+    function renderModalAwardButtons() {
+        mAwardButtons.innerHTML = '';
+        if (teams.length === 0) {
+            mAwardButtons.innerHTML = `<span style="color: var(--text-muted); font-size: 0.85rem;">No teams configured. Close to return.</span>`;
+            return;
+        }
+
+        teams.forEach((team, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-award';
+            btn.innerText = `+ $${currentQuestionValue} (${team.name})`;
+            btn.onclick = () => awardPointsAndClose(index);
+            mAwardButtons.appendChild(btn);
+        });
+
+        const btnNone = document.createElement('button');
+        btnNone.className = 'btn-award btn-award-none';
+        btnNone.innerText = 'No One / Pass';
+        btnNone.onclick = () => closeModal();
+        mAwardButtons.appendChild(btnNone);
+    }
+
+    function awardPointsAndClose(teamIndex) {
+        adjustScore(teamIndex, currentQuestionValue);
+        closeModal();
     }
 
     function closeModal() {
@@ -554,7 +860,9 @@
         }
     }
 
+    // Initialize Page
     buildBoard();
+    renderScoreboard();
 </script>
 
 </body>
