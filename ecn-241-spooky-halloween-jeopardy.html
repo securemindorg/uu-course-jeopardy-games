@@ -17,6 +17,8 @@
             --border: #374151;
             --jeopardy-blue: #1d4ed8;
             --jeopardy-gold: #facc15;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
         }
 
         body {
@@ -24,15 +26,15 @@
             background-color: var(--spooky-dark);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
-            line-height: 1.5;
+            padding: 15px;
+            line-height: 1.4;
             background-image: radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.05) 0%, transparent 40%),
                               radial-gradient(circle at 90% 80%, rgba(30, 27, 75, 0.4) 0%, transparent 50%);
             overflow-x: hidden;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             position: relative;
         }
@@ -50,32 +52,24 @@
 
         .spider-thread {
             width: 2px;
-            height: 220px;
+            height: 180px;
             background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.3));
             margin: 0 auto;
             box-shadow: 0 0 5px rgba(255,255,255,0.5);
         }
 
         .spider-svg {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             margin-top: -2px;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
         }
 
         @keyframes spiderDropLift {
-            0% {
-                transform: translate(-50%, -240px);
-            }
-            35% {
-                transform: translate(-50%, 0px);
-            }
-            55% {
-                transform: translate(-50%, 0px);
-            }
-            100% {
-                transform: translate(-50%, -180px);
-            }
+            0% { transform: translate(-50%, -200px); }
+            35% { transform: translate(-50%, 0px); }
+            55% { transform: translate(-50%, 0px); }
+            100% { transform: translate(-50%, -150px); }
         }
 
         /* GitHub Button in Upper Right */
@@ -85,16 +79,16 @@
             right: 0;
             background-color: var(--pumpkin-orange);
             color: white;
-            padding: 10px 18px;
+            padding: 8px 14px;
             border-radius: 8px;
             font-weight: 600;
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
             transition: background-color 0.2s, transform 0.1s;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             z-index: 10;
         }
 
@@ -104,21 +98,21 @@
         }
 
         .github-corner svg {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             fill: currentColor;
         }
 
         header {
             background-color: var(--card-bg);
             color: white;
-            padding: 25px 20px;
+            padding: 15px 20px;
             border-radius: 12px;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             border: 2px solid var(--border);
-            border-bottom: 5px solid var(--pumpkin-orange);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            border-bottom: 4px solid var(--pumpkin-orange);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
             position: relative;
             overflow: hidden;
         }
@@ -141,15 +135,15 @@
         }
 
         header h1 {
-            margin: 0 0 5px 0;
-            font-size: 2.2rem;
+            margin: 0 0 2px 0;
+            font-size: 1.8rem;
             letter-spacing: 0.5px;
             color: var(--ghost-white);
         }
 
         header h2 {
-            margin: 0 0 5px 0;
-            font-size: 1.1rem;
+            margin: 0 0 2px 0;
+            font-size: 0.95rem;
             color: var(--pumpkin-orange);
             font-weight: 600;
             text-transform: uppercase;
@@ -158,44 +152,91 @@
         header p {
             margin: 0;
             color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Application Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        .nav-tab {
+            background-color: #1f2937;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            font-weight: 600;
             font-size: 0.95rem;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: var(--ghost-white);
+            background-color: #374151;
+        }
+
+        .nav-tab.active {
+            background-color: var(--pumpkin-orange);
+            color: white;
+            border-color: var(--pumpkin-orange);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Two-Column Layout (Board + Right Sidebar) */
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 15px;
+            align-items: start;
         }
 
         /* Jeopardy Board Grid */
         .board {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
-            margin-bottom: 25px;
+            gap: 10px;
         }
 
         .category-header {
             background-color: var(--spooky-purple);
             color: var(--ghost-white);
-            padding: 15px 10px;
+            padding: 12px 6px;
             text-align: center;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             border-radius: 8px;
             border: 1px solid var(--border);
             border-bottom: 3px solid var(--pumpkin-orange);
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 55px;
+            min-height: 50px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
         .tile {
             background-color: var(--jeopardy-blue);
             color: var(--jeopardy-gold);
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: bold;
-            padding: 25px 10px;
+            padding: 20px 5px;
             text-align: center;
             border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s, box-shadow 0.2s;
+            transition: transform 0.1s, background-color 0.2s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             user-select: none;
             border: 1px solid rgba(255,255,255,0.1);
@@ -203,8 +244,7 @@
 
         .tile:hover {
             background-color: #2563eb;
-            transform: scale(1.03);
-            box-shadow: 0 6px 12px rgba(29, 78, 216, 0.4);
+            transform: scale(1.02);
         }
 
         .tile.used {
@@ -214,6 +254,152 @@
             transform: none;
             box-shadow: none;
             border: 1px solid #111827;
+        }
+
+        /* Sidebar Scoreboard */
+        .sidebar-scoreboard {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border);
+            border-top: 4px solid var(--pumpkin-orange);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            position: sticky;
+            top: 15px;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            color: var(--pumpkin-orange);
+            font-weight: bold;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .sidebar-teams-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar-team-card {
+            background-color: #1f2937;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .sidebar-team-name {
+            font-weight: bold;
+            font-size: 0.95rem;
+            color: var(--ghost-white);
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .sidebar-team-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--jeopardy-gold);
+            margin-bottom: 6px;
+        }
+
+        .sidebar-adjust-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-mini {
+            background-color: #374151;
+            color: white;
+            border: none;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-mini:hover {
+            background-color: #4b5563;
+        }
+
+        /* Team Setup Tab Styling */
+        .setup-container {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border);
+            border-top: 4px solid var(--pumpkin-orange);
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .setup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .team-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .team-input-group input {
+            flex: 1;
+            background-color: #1f2937;
+            border: 1px solid var(--border);
+            color: var(--ghost-white);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .team-input-group input:focus {
+            border-color: var(--pumpkin-orange);
+        }
+
+        .setup-teams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .setup-team-card {
+            background-color: #1f2937;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+            text-align: center;
+        }
+
+        .btn-delete-team {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn-delete-team:hover {
+            color: var(--danger-red);
         }
 
         /* Modal Overlay */
@@ -235,7 +421,7 @@
         .modal-content {
             background-color: var(--card-bg);
             color: var(--text-main);
-            padding: 35px;
+            padding: 30px;
             border-radius: 12px;
             max-width: 750px;
             width: 100%;
@@ -269,7 +455,7 @@
         }
 
         .modal-question {
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             color: var(--ghost-white);
             margin-bottom: 15px;
             line-height: 1.4;
@@ -280,7 +466,7 @@
             width: 100%;
             height: auto;
             border-radius: 8px;
-            margin: 10px auto 20px auto;
+            margin: 10px auto 15px auto;
             display: block;
             border: 1px solid var(--border);
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
@@ -288,7 +474,7 @@
 
         .modal-answer-container {
             display: none;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             background: #1f2937;
             padding: 15px;
             border-radius: 8px;
@@ -304,9 +490,54 @@
         }
 
         .modal-answer {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             color: #34d399;
             font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .award-section {
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+
+        .award-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--pumpkin-orange);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .award-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-award {
+            background-color: var(--spooky-purple);
+            color: var(--ghost-white);
+            border: 1px solid var(--pumpkin-orange);
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-award:hover {
+            background-color: var(--pumpkin-orange);
+        }
+
+        .btn-award-none {
+            background-color: #374151;
+            border: 1px solid var(--border);
+        }
+
+        .btn-award-none:hover {
+            background-color: #4b5563;
         }
 
         .modal-controls {
@@ -319,17 +550,16 @@
             background-color: var(--pumpkin-orange);
             color: white;
             border: none;
-            padding: 12px 24px;
-            font-size: 1rem;
+            padding: 10px 20px;
+            font-size: 0.95rem;
             font-weight: 600;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
+            transition: background-color 0.2s;
         }
 
         button:hover {
             background-color: var(--pumpkin-hover);
-            transform: translateY(-1px);
         }
 
         button.secondary {
@@ -340,19 +570,9 @@
             background-color: #4b5563;
         }
 
-        @media (max-width: 768px) {
-            .board {
-                grid-template-columns: repeat(1, 1fr);
-            }
-            .tile {
-                font-size: 1.2rem;
-                padding: 15px;
-            }
-            .github-corner {
-                position: relative;
-                margin-bottom: 15px;
-                justify-content: center;
-            }
+        @media (max-width: 900px) {
+            .game-layout { grid-template-columns: 1fr; }
+            .sidebar-scoreboard { position: static; }
         }
     </style>
 </head>
@@ -395,9 +615,44 @@
         <p>Utica University • Halloween Review Session</p>
     </header>
 
-    <!-- Jeopardy Board -->
-    <div class="board" id="jeopardy-board">
-        <!-- Categories generated by JS -->
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('game-tab')">🎮 Game Board</button>
+        <button class="nav-tab" onclick="switchTab('setup-tab')">⚙️ Team Setup</button>
+    </div>
+
+    <!-- TAB 1: Game Board Layout -->
+    <div id="game-tab" class="tab-content active">
+        <div class="game-layout">
+            <div class="board" id="jeopardy-board"></div>
+
+            <!-- Right Sidebar Scoreboard -->
+            <div class="sidebar-scoreboard">
+                <div class="sidebar-title">🏆 Scoreboard</div>
+                <div class="sidebar-teams-list" id="sidebar-teams-container">
+                    <!-- Dynamic Sidebar Cards -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: Team Setup -->
+    <div id="setup-tab" class="tab-content">
+        <div class="setup-container">
+            <div class="setup-header">
+                <h2>Manage Teams</h2>
+                <button class="secondary" onclick="resetScores()">Reset Scores</button>
+            </div>
+
+            <div class="team-input-group">
+                <input type="text" id="new-team-name" placeholder="Enter new team name..." onkeydown="if(event.key==='Enter') addTeam()">
+                <button onclick="addTeam()">+ Add Team</button>
+            </div>
+
+            <div class="setup-teams-grid" id="setup-teams-container">
+                <!-- Setup Cards -->
+            </div>
+        </div>
     </div>
 </div>
 
@@ -414,6 +669,11 @@
         <div class="modal-answer-container" id="m-answer-container">
             <div class="modal-answer-label">Correct Answer:</div>
             <div class="modal-answer" id="m-answer">Answer text goes here...</div>
+            
+            <div class="award-section">
+                <div class="award-title">Award Points To:</div>
+                <div class="award-buttons" id="m-award-buttons"></div>
+            </div>
         </div>
 
         <div class="modal-controls">
@@ -508,6 +768,14 @@
         }
     ];
 
+    // App State
+    let teams = JSON.parse(localStorage.getItem('spooky_stats_teams')) || [
+        { name: "Team Vampires", score: 0 },
+        { name: "Team Werewolves", score: 0 }
+    ];
+    let currentTile = null;
+    let currentQuestionValue = 0;
+
     const boardEl = document.getElementById('jeopardy-board');
     const modalEl = document.getElementById('question-modal');
     const mCategory = document.getElementById('m-category');
@@ -517,12 +785,100 @@
     const mAnswerContainer = document.getElementById('m-answer-container');
     const mAnswer = document.getElementById('m-answer');
     const btnReveal = document.getElementById('btn-reveal');
+    const mAwardButtons = document.getElementById('m-award-buttons');
+    const sidebarTeamsContainer = document.getElementById('sidebar-teams-container');
+    const setupTeamsContainer = document.getElementById('setup-teams-container');
 
-    let currentTile = null;
+    function switchTab(tabId) {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        if (tabId === 'game-tab') {
+            document.querySelectorAll('.nav-tab')[0].classList.add('active');
+            document.getElementById('game-tab').classList.add('active');
+        } else {
+            document.querySelectorAll('.nav-tab')[1].classList.add('active');
+            document.getElementById('setup-tab').classList.add('active');
+        }
+    }
+
+    function saveTeams() {
+        localStorage.setItem('spooky_stats_teams', JSON.stringify(teams));
+    }
+
+    function renderScoreboards() {
+        // Render Sidebar View
+        sidebarTeamsContainer.innerHTML = '';
+        if (teams.length === 0) {
+            sidebarTeamsContainer.innerHTML = `<div style="color: var(--text-muted); text-align: center; font-size: 0.85rem;">No teams added. Use 'Team Setup' tab.</div>`;
+        } else {
+            teams.forEach((team, index) => {
+                const card = document.createElement('div');
+                card.className = 'sidebar-team-card';
+                card.innerHTML = `
+                    <div class="sidebar-team-name">${escapeHtml(team.name)}</div>
+                    <div class="sidebar-team-score">$${team.score}</div>
+                    <div class="sidebar-adjust-btns">
+                        <button class="btn-mini" onclick="adjustScore(${index}, -100)">-$100</button>
+                        <button class="btn-mini" onclick="adjustScore(${index}, 100)">+$100</button>
+                    </div>
+                `;
+                sidebarTeamsContainer.appendChild(card);
+            });
+        }
+
+        // Render Setup View
+        setupTeamsContainer.innerHTML = '';
+        teams.forEach((team, index) => {
+            const card = document.createElement('div');
+            card.className = 'setup-team-card';
+            card.innerHTML = `
+                <button class="btn-delete-team" onclick="deleteTeam(${index})" title="Remove Team">✕</button>
+                <div style="font-weight: bold; font-size: 1.1rem; color: var(--ghost-white);">${escapeHtml(team.name)}</div>
+                <div style="font-size: 1.5rem; color: var(--jeopardy-gold); margin: 8px 0;">$${team.score}</div>
+                <button class="btn-mini" onclick="adjustScore(${index}, -100)">-$100</button>
+                <button class="btn-mini" onclick="adjustScore(${index}, 100)">+$100</button>
+            `;
+            setupTeamsContainer.appendChild(card);
+        });
+    }
+
+    function addTeam() {
+        const input = document.getElementById('new-team-name');
+        const name = input.value.trim();
+        if (!name) return;
+        teams.push({ name, score: 0 });
+        input.value = '';
+        saveTeams();
+        renderScoreboards();
+    }
+
+    function deleteTeam(index) {
+        teams.splice(index, 1);
+        saveTeams();
+        renderScoreboards();
+    }
+
+    function adjustScore(index, delta) {
+        teams[index].score += delta;
+        saveTeams();
+        renderScoreboards();
+    }
+
+    function resetScores() {
+        if (confirm("Reset all team scores to $0?")) {
+            teams.forEach(t => t.score = 0);
+            saveTeams();
+            renderScoreboards();
+        }
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
 
     function buildBoard() {
         boardEl.innerHTML = '';
-        
         gameData.forEach(col => {
             const header = document.createElement('div');
             header.className = 'category-header';
@@ -538,7 +894,6 @@
                 tile.innerText = `$${qData.value}`;
                 tile.dataset.col = colIndex;
                 tile.dataset.row = rowIndex;
-                
                 tile.onclick = () => openQuestion(colIndex, rowIndex, tile);
                 boardEl.appendChild(tile);
             });
@@ -550,13 +905,13 @@
 
         currentTile = tile;
         const qData = gameData[colIndex].questions[rowIndex];
+        currentQuestionValue = qData.value;
 
         mCategory.innerText = gameData[colIndex].category;
         mValue.innerText = `$${qData.value}`;
         mQuestion.innerText = qData.q;
         mAnswer.innerText = qData.a;
         
-        // Render Base64 image reliably
         if (qData.image) {
             imageContainer.innerHTML = `<img src="${qData.image}" class="question-image" alt="Statistical Distribution Chart">`;
             imageContainer.style.display = 'block';
@@ -573,6 +928,34 @@
     function revealAnswer() {
         mAnswerContainer.style.display = 'block';
         btnReveal.style.display = 'none';
+        renderModalAwardButtons();
+    }
+
+    function renderModalAwardButtons() {
+        mAwardButtons.innerHTML = '';
+        if (teams.length === 0) {
+            mAwardButtons.innerHTML = `<span style="color: var(--text-muted); font-size: 0.85rem;">No teams configured. Use 'Team Setup' tab.</span>`;
+            return;
+        }
+
+        teams.forEach((team, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-award';
+            btn.innerText = `+ $${currentQuestionValue} (${team.name})`;
+            btn.onclick = () => awardPointsAndClose(index);
+            mAwardButtons.appendChild(btn);
+        });
+
+        const btnNone = document.createElement('button');
+        btnNone.className = 'btn-award btn-award-none';
+        btnNone.innerText = 'No One / Pass';
+        btnNone.onclick = () => closeModal();
+        mAwardButtons.appendChild(btnNone);
+    }
+
+    function awardPointsAndClose(teamIndex) {
+        adjustScore(teamIndex, currentQuestionValue);
+        closeModal();
     }
 
     function closeModal() {
@@ -584,6 +967,7 @@
     }
 
     buildBoard();
+    renderScoreboards();
 </script>
 
 </body>
