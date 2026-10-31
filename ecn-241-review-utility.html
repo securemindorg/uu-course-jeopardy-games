@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECN 241: Economic Statistics Study Portal - Utica University</title>
+    <style>
+        :root {
+            --utica-navy: #0C223F;
+            --utica-orange: #E65300;
+            --utica-light-bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --correct-green: #10b981;
+            --incorrect-red: #ef4444;
+            --accent-blue: #2563eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--utica-light-bg);
+            color: var(--text-dark);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background-color: var(--utica-navy);
+            color: white;
+            padding: 25px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 5px solid var(--utica-orange);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #cbd5e1;
+            font-size: 1rem;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* Module Grid */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .module-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--utica-navy);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s, border-top-color 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .module-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            border-top-color: var(--utica-orange);
+        }
+
+        .module-card h3 {
+            color: var(--utica-navy);
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+        }
+
+        .module-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .card-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: #e2e8f0;
+            color: var(--utica-navy);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        .badge-orange {
+            background: #ffedd5;
+            color: var(--utica-orange);
+        }
+
+        /* Nav & Controls */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: var(--utica-orange);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #c44500;
+        }
+
+        .btn-secondary {
+            background-color: var(--utica-navy);
+        }
+
+        .btn-secondary:hover {
+            background-color: #061426;
+        }
+
+        .mode-toggle-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background-color: white;
+            color: var(--utica-navy);
+            border: 2px solid var(--utica-navy);
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background-color: var(--utica-navy);
+            color: white;
+        }
+
+        /* 3D Flashcard Styling */
+        .flashcard-container {
+            perspective: 1000px;
+            max-width: 650px;
+            margin: 0 auto 20px auto;
+            height: 330px;
+            cursor: pointer;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: white;
+            border: 2px solid var(--border-color);
+        }
+
+        .card-front {
+            border-top: 8px solid var(--utica-navy);
+        }
+
+        .card-front h2 {
+            color: var(--utica-navy);
+            font-size: 1.5rem;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            border-top: 8px solid var(--utica-orange);
+            background: #fafafc;
+        }
+
+        .card-back p {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+        }
+
+        .card-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        /* Matching Game Styling */
+        .matching-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .matching-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .matching-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            padding: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+        }
+
+        .matching-card:hover {
+            border-color: var(--utica-orange);
+        }
+
+        .matching-card.selected {
+            border-color: var(--utica-navy);
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 2px var(--utica-navy);
+        }
+
+        .matching-card.matched {
+            border-color: var(--correct-green);
+            background-color: #ecfdf5;
+            color: var(--correct-green);
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .matching-card.wrong {
+            border-color: var(--incorrect-red);
+            background-color: #fef2f2;
+            animation: shake 0.3s;
+        }
+
+        /* Word Problems Mode Styling */
+        .problem-card {
+            background: white;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            border-top: 8px solid var(--utica-orange);
+            padding: 25px;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.06);
+        }
+
+        .concept-tag {
+            display: inline-block;
+            background: #fff7ed;
+            color: var(--utica-orange);
+            border: 1px solid #ffedd5;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .company-title {
+            color: var(--utica-navy);
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .problem-scenario {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: #f8fafc;
+            border: 2px solid var(--border-color);
+            padding: 14px 18px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--utica-navy);
+            background: #eff6ff;
+        }
+
+        .option-btn.correct {
+            border-color: var(--correct-green) !important;
+            background: #ecfdf5 !important;
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        .option-btn.incorrect {
+            border-color: var(--incorrect-red) !important;
+            background: #fef2f2 !important;
+            color: #991b1b;
+        }
+
+        .option-letter {
+            background: #e2e8f0;
+            color: var(--utica-navy);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .explanation-box {
+            display: none;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-left: 5px solid var(--correct-green);
+            padding: 18px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .explanation-box.show {
+            display: block;
+        }
+
+        .explanation-box h4 {
+            color: #065f46;
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+
+        .score-tracker {
+            text-align: center;
+            font-weight: 700;
+            color: var(--utica-navy);
+            margin-bottom: 15px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 768px) {
+            .matching-board {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h2>ECN 241: Economics Statistics</h2>
+        <h1>Course Review Portal</h1>
+        <p>Utica University • Department of Business and Economics</p>
+    </header>
+
+    <!-- MAIN MENU VIEW -->
+    <section id="menu-view" class="view-section active">
+        <h2 style="color: var(--utica-navy); margin-bottom: 15px; text-align: center;">Select a Review Module</h2>
+        <div class="module-grid" id="module-grid-container"></div>
+    </section>
+
+    <!-- STUDY SESSION VIEW -->
+    <section id="study-view" class="view-section">
+        <div class="top-nav">
+            <button class="btn btn-secondary" onclick="showMenuView()">← Back to Modules</button>
+            <h2 id="current-module-title" style="color: var(--utica-navy); font-size: 1.2rem;"></h2>
+        </div>
+
+        <div class="mode-toggle-group">
+            <button class="mode-btn active" id="btn-mode-flashcards" onclick="setMode('flashcards')">🃏 Flashcards</button>
+            <button class="mode-btn" id="btn-mode-matching" onclick="setMode('matching')">🧩 Definition Matching</button>
+            <button class="mode-btn" id="btn-mode-problems" onclick="setMode('problems')">📊 Scenario Word Problems</button>
+        </div>
+
+        <!-- Mode 1: Flashcards -->
+        <div id="flashcard-mode-container">
+            <div class="flashcard-container" onclick="flipCard()">
+                <div class="flashcard" id="flashcard-el">
+                    <div class="card-face card-front">
+                        <h2 id="card-term">Term</h2>
+                        <div class="card-hint">Click card to reveal definition</div>
+                    </div>
+                    <div class="card-face card-back">
+                        <p id="card-def">Definition goes here...</p>
+                        <div class="card-hint">Click card to see term</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-controls">
+                <button class="btn btn-secondary" onclick="prevCard()">Previous</button>
+                <span id="card-progress" style="font-weight: 700; color: var(--utica-navy);">1 / 10</span>
+                <button class="btn" onclick="nextCard()">Next</button>
+            </div>
+        </div>
+
+        <!-- Mode 2: Matching -->
+        <div id="matching-mode-container" style="display: none;">
+            <div class="score-tracker" id="matching-score">Matches: 0 / 0</div>
+            <div class="matching-board">
+                <div class="matching-column" id="terms-column"></div>
+                <div class="matching-column" id="defs-column"></div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="initMatchingMode()">🔀 Reset & Shuffle Game</button>
+            </div>
+        </div>
+
+        <!-- Mode 3: Scenario Word Problems -->
+        <div id="problems-mode-container" style="display: none;">
+            <div class="score-tracker" id="problem-progress">Question 1 of 2</div>
+            
+            <div class="problem-card">
+                <span class="concept-tag" id="problem-concept">Statistical Concept</span>
+                <div class="company-title" id="problem-company">Company Scenario</div>
+                <p class="problem-scenario" id="problem-text"></p>
+                
+                <div class="options-grid" id="options-container"></div>
+                
+                <div class="explanation-box" id="explanation-box">
+                    <h4>Step-by-Step Solution & Business Explanation:</h4>
+                    <p id="explanation-text"></p>
+                </div>
+            </div>
+
+            <div class="card-controls">
+                <button class="btn btn-secondary" onclick="prevProblem()">Previous Problem</button>
+                <button class="btn" onclick="nextProblem()">Next Problem</button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    const modulesData = [
+        {
+            id: 1,
+            title: "Module 1: What is Statistics",
+            description: "Descriptive vs. Inferential, Population vs. Sample, Data Types & Common Data Traps.",
+            terms: [
+                { term: "Statistics", def: "The science of collecting, organizing, analyzing, presenting, and interpreting data to assist in making more effective decisions[cite: 5]." },
+                { term: "Descriptive Statistics", def: "Methods of organizing, summarizing, and presenting data in an informative way (e.g., charts, graphs, averages)[cite: 5]." },
+                { term: "Inferential Statistics", def: "Methods used to estimate a property of a population based on a sample (also called statistical inference)[cite: 5]." },
+                { term: "Population", def: "A collection of all possible individuals, objects, or measurements of interest[cite: 5]." },
+                { term: "Sample", def: "A portion, or part, of the population of interest[cite: 5]." },
+                { term: "Qualitative Variable", def: "Non-numeric characteristics where data are sorted into categories (e.g., gender, eye color, state of residence)[cite: 5]." },
+                { term: "Quantitative Variable", def: "Numeric characteristics where data are reported numerically (e.g., bank balance, number of employees, height)[cite: 5]." },
+                { term: "Discrete Variable", def: "A quantitative variable that can assume only certain values with clear gaps (e.g., number of children: 0, 1, 2)[cite: 5]." },
+                { term: "Continuous Variable", def: "A quantitative variable that can assume any value within a specific range (e.g., weight, temperature, time)[cite: 5]." },
+                { term: "Selection Bias", def: "A data trap occurring when a sample systematically excludes or favors certain population segments." }
+            ],
+            problems: [
+                {
+                    company: "Aura Retail Group — Store Auditing",
+                    concept: "Inferential vs Descriptive Statistics & Sampling",
+                    text: "Aura Retail operates 250 retail stores across the US. The internal audit team randomly inspects financial records at 10 stores and finds an average cash variance of $45 per week. Management uses this $45 figure to estimate total annual auditing loss across all 250 stores. What statistical methodology did management use, and what constitutes the sample vs. population?",
+                    options: [
+                        "Descriptive statistics; Population = 10 stores, Sample = 250 stores",
+                        "Inferential statistics; Population = All 250 stores, Sample = 10 inspected stores",
+                        "Qualitative analysis; Population = 10 stores, Sample = $45 cash variance",
+                        "Selection bias; Population = 10 stores, Sample = 240 uninspected stores"
+                    ],
+                    correctIndex: 1,
+                    explanation: "Management performed Inferential Statistics because they took data from a smaller subset (Sample of 10 stores) to draw conclusions about the entire organization (Population of 250 stores)."
+                },
+                {
+                    company: "Utica Logistics — Vehicle Tracking",
+                    concept: "Classifying Data Variables",
+                    text: "Utica Logistics tracks four data attributes for its fleet: (1) Fleet ID Number, (2) Fuel Tank Level in Gallons, (3) Number of Deliveries Completed, and (4) Driver Performance Rating (Poor, Good, Excellent). Which correctly identifies the variable types for (2) and (3)?",
+                    options: [
+                        "(2) Continuous Quantitative, (3) Discrete Quantitative",
+                        "(2) Discrete Quantitative, (3) Continuous Quantitative",
+                        "(2) Qualitative Attribute, (3) Discrete Quantitative",
+                        "(2) Continuous Quantitative, (3) Qualitative Attribute"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Fuel level (2) can take on any infinite fractional value within a range (e.g., 14.35 gallons), making it Continuous. The number of completed deliveries (3) is countable whole numbers (0, 1, 2, 3), making it Discrete Quantitative."
+                }
+            ]
+        },
+        {
+            id: 2,
+            title: "Module 2: Architecture of Data",
+            description: "Data provenance, hygiene, ethics, and levels of measurement.",
+            terms: [
+                { term: "Nominal Level", def: "Data sorted into categories with no particular order or ranking (e.g., colors, car brands, yes/no responses)[cite: 5]." },
+                { term: "Ordinal Level", def: "Data arranged in order, but differences between data values cannot be determined or are meaningless (e.g., letter grades A, B, C; customer ratings)[cite: 5]." },
+                { term: "Interval Level", def: "Ordinal data with meaningful differences between values, but with no true zero point (e.g., Temperature in Fahrenheit or Celsius)[cite: 5]." },
+                { term: "Ratio Level", def: "The highest measurement level possessing interval characteristics plus a true zero point representing an absolute absence (e.g., income, sales revenue)[cite: 5]." },
+                { term: "Data Provenance", def: "The historical record of data origin, ownership, and transformations over time." },
+                { term: "Data Hygiene", def: "The process of identifying, scrubbing, and correcting inaccurate or corrupt records from a dataset." },
+                { term: "Analysis ToolPak", def: "A built-in Excel add-in program providing data analysis tools for financial and statistical summaries[cite: 5]." }
+            ],
+            problems: [
+                {
+                    company: "Mohawk Valley Bank — Loan Classification",
+                    concept: "Levels of Data Measurement",
+                    text: "Mohawk Valley Bank records four fields for loan applicants: (A) Account Number, (B) Credit Score Rank (Low Risk, Medium Risk, High Risk), (C) Temperature of Branch Office in °F, and (D) Annual Business Revenue. What is the level of measurement for Credit Score Rank (B) and Annual Business Revenue (D)?",
+                    options: [
+                        "(B) Nominal, (D) Interval",
+                        "(B) Ordinal, (D) Ratio",
+                        "(B) Interval, (D) Ratio",
+                        "(B) Ordinal, (D) Interval"
+                    ],
+                    correctIndex: 1,
+                    explanation: "Credit Score Rank (B) has a clear natural ordering (Low < Medium < High), but differences between ranks are not uniform numbers, making it Ordinal. Annual Business Revenue (D) has meaningful numeric differences and a true absolute zero ($0 means no revenue), making it Ratio Level."
+                },
+                {
+                    company: "Aura Retail Group — Customer Data Scrubbing",
+                    concept: "Data Hygiene & Ethics",
+                    text: "An analyst discovers that 15% of customer records in the CRM have missing purchase amounts, negative ages (-5 years), or duplicate entries. Before running a sales forecasting model, the analyst removes duplicate records and flags missing values. Which statistical practice does this represent?",
+                    options: [
+                        "Data Hygiene (Data Cleaning)",
+                        "Inferential Sampling Error",
+                        "Qualitative Ordinal Scaling",
+                        "Selection Bias Acceleration"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Data Hygiene involves identifying, scrubbing, and correcting corrupt, incomplete, or inaccurate records before conducting formal analytical modeling."
+                }
+            ]
+        },
+        {
+            id: 3,
+            title: "Module 3: Tables & Visualizations",
+            description: "Frequency distributions, Histograms, Scatterplots, and PivotTables.",
+            terms: [
+                { term: "Frequency Distribution", def: "A tabular summary of data showing the number (frequency) of items in each of several non-overlapping classes[cite: 5]." },
+                { term: "Histogram", def: "A graph display of contiguous vertical bars representing class frequencies of continuous quantitative data[cite: 5]." },
+                { term: "Scatterplot", def: "A visual diagram plotting pairs of numerical variables on two axes to inspect relationships or correlations." },
+                { term: "PivotTable", def: "An interactive data summarization tool used to aggregate, sort, count, and re-arrange table data dynamically." },
+                { term: "Relative Frequency", def: "The fraction or percentage of total observations belonging to a specific class." },
+                { term: "Cumulative Frequency", def: "The running total of frequencies accumulated across successive classes up to a given boundary." }
+            ],
+            problems: [
+                {
+                    company: "Utica Espresso Corp — Quality Assurance",
+                    concept: "Relative & Cumulative Frequency",
+                    text: "Utica Espresso inspects 200 bags of coffee beans for weight accuracy. The frequency table shows: [15.0 - 15.4 oz: 20 bags], [15.5 - 15.9 oz: 70 bags], [16.0 - 16.4 oz: 90 bags], [16.5 - 16.9 oz: 20 bags]. What is the relative frequency of bags weighing between 15.5 and 15.9 oz, and what is the cumulative relative frequency up to 15.9 oz?",
+                    options: [
+                        "Relative Frequency = 35%; Cumulative Relative Frequency = 45%",
+                        "Relative Frequency = 70%; Cumulative Relative Frequency = 90%",
+                        "Relative Frequency = 45%; Cumulative Relative Frequency = 80%",
+                        "Relative Frequency = 35%; Cumulative Relative Frequency = 80%"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Relative frequency for 15.5-15.9 oz = 70 / 200 = 0.35 (35%). Cumulative frequency up to 15.9 oz includes the first two classes: (20 + 70) / 200 = 90 / 200 = 0.45 (45%)."
+                }
+            ]
+        },
+        {
+            id: 4,
+            title: "Module 4: Exploring Business Data",
+            description: "Measures of location, Skewness, Percentiles, and Quartiles.",
+            terms: [
+                { term: "Arithmetic Mean", def: "The sum of all values divided by the total number of values (μ for population, x̄ for sample); sensitive to extreme outliers[cite: 5]." },
+                { term: "Median", def: "The midpoint of values ordered from smallest to largest; not affected by extreme outliers[cite: 5]." },
+                { term: "Mode", def: "The value that appears most frequently in a data set[cite: 5]." },
+                { term: "Weighted Mean", def: "A mean calculated by assigning weights to each value based on relative importance or frequency[cite: 5]." },
+                { term: "Geometric Mean", def: "A specialized mean useful for finding average growth rates over multiple periods in finance and economics[cite: 5]." },
+                { term: "Variance", def: "A measure of data dispersion based on the squared deviations from the mean[cite: 2, 6]." },
+                { term: "Standard Deviation", def: "The square root of the variance, measuring standard spread around the mean[cite: 2, 5]." },
+                { term: "Empirical Rule", def: "States that roughly 68%, 95%, and 99.7% of bell-curve data fall within 1, 2, and 3 standard deviations of mean." },
+                { term: "Positively Skewed (Right-Skewed)", def: "A distribution with a long tail stretching to the right where the mean is pulled higher than the median[cite: 6, 12]." },
+                { term: "Negatively Skewed (Left-Skewed)", def: "A distribution with a long tail stretching to the left where the mean is pulled lower than the median[cite: 6]." }
+            ],
+            problems: [
+                {
+                    company: "Aura Retail Group — Compensation Audit",
+                    concept: "Mean vs. Median Under Skewness",
+                    text: "Aura Retail analyzes monthly salaries for 50 employees at its headquarters. Analysis ToolPak output reveals: Mean = $81,260, Median = $84,500, Standard Deviation = $12,600. The lowest recorded salary is an outlier intern at $12,000. Is this salary distribution positively or negatively skewed, and which metric best reflects a typical employee salary?",
+                    options: [
+                        "Positively skewed; Use Mean ($81,260)",
+                        "Negatively skewed (left-skewed); Use Median ($84,500)",
+                        "Symmetrical; Use Mean ($81,260)",
+                        "Negatively skewed; Use Mode only"
+                    ],
+                    correctIndex: 1,
+                    explanation: "Because the Mean ($81,260) is lower than the Median ($84,500), the distribution has a left-hand tail pulled down by low outliers (Negatively Skewed). The Median resists extreme outliers and best represents the typical employee salary."
+                },
+                {
+                    company: "Utica Manufacturing — Quality Tolerances",
+                    concept: "The Empirical Rule (68-95-99.7)",
+                    text: "Utica Manufacturing produces steel rods with a mean diameter μ = 10.0 mm and standard deviation σ = 0.2 mm. Assuming rod diameters follow a symmetric bell curve, between what two boundary values will approximately 95% of all manufactured rods lie?",
+                    options: [
+                        "9.8 mm and 10.2 mm",
+                        "9.6 mm and 10.4 mm",
+                        "9.4 mm and 10.6 mm",
+                        "9.0 mm and 11.0 mm"
+                    ],
+                    correctIndex: 1,
+                    explanation: "By the Empirical Rule, roughly 95% of observations fall within ±2 standard deviations of the mean: μ ± 2σ = 10.0 ± 2(0.2) = 10.0 ± 0.4 = [9.6 mm, 10.4 mm]."
+                }
+            ]
+        },
+        {
+            id: 5,
+            title: "Module 5: Probability Concepts",
+            description: "Experiments, Sample Spaces, Addition/Multiplication rules, Contingency tables, and Counting.",
+            terms: [
+                { term: "Sample Space", def: "The set of all possible outcomes of a given experiment[cite: 12]." },
+                { term: "Probability", def: "A numerical value between 0 and 1 describing the likelihood that an uncertain event will occur." },
+                { term: "Experiment", def: "A process that leads to the occurrence of one and only one of several possible observations." },
+                { term: "Empirical Probability", def: "Probability based on historical data, experiments, or computer simulations rather than theoretical calculation[cite: 12]." },
+                { term: "Complement Rule", def: "Rule used to find the probability of an event not occurring: 1 - P(A)." },
+                { term: "Addition Rule (Probability)", def: "Rule used to calculate P(A or B) = P(A) + P(B) - P(A and B)." },
+                { term: "Multiplication Rule (Probability)", def: "Rule used to calculate joint probability P(A and B) = P(A) * P(B|A)." },
+                { term: "Conditional Probability", def: "The probability of an event occurring given that another event has already occurred: P(A|B)[cite: 12]." },
+                { term: "Marginal Probability", def: "Probabilities calculated using row or column totals in a contingency table[cite: 12]." },
+                { term: "Permutation", def: "An arrangement of a set of objects where the order of selection MATTERS (e.g., race finish places)[cite: 12]." },
+                { term: "Combination", def: "An arrangement of a set of objects where the order of selection DOES NOT matter (e.g., choosing a committee)[cite: 12]." }
+            ],
+            problems: [
+                {
+                    company: "Aura E-Commerce — Promotion Bundles",
+                    concept: "Combinations vs Permutations",
+                    text: "Aura Retail's marketing team wants to offer a holiday mystery gift box containing 3 distinct luxury items chosen from a catalog of 8 available products. Order of placement inside the box does not matter. How many unique gift boxes can marketing construct?",
+                    options: [
+                        "56 unique gift boxes",
+                        "336 unique gift boxes",
+                        "24 unique gift boxes",
+                        "512 unique gift boxes"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Since selection order does not matter, use Combinations: C(n, r) = n! / [r!(n-r)!] = 8! / [3!(5!)] = (8 × 7 × 6) / (3 × 2 × 1) = 336 / 6 = 56 combinations (or Excel =COMBIN(8, 3))."
+                },
+                {
+                    company: "Mohawk Insurance — Risk Assessment",
+                    concept: "Conditional Probability from Contingency Tables",
+                    text: "A survey of 1,000 policyholders reveals: 300 are VIP members, 400 submitted a claim this year, and 120 are VIP members who submitted a claim. What is the conditional probability that a randomly chosen policyholder submitted a claim, GIVEN that they are a VIP member: P(Claim | VIP)?",
+                    options: [
+                        "120 / 1000 = 0.12 (12%)",
+                        "120 / 400 = 0.30 (30%)",
+                        "120 / 300 = 0.40 (40%)",
+                        "300 / 1000 = 0.30 (30%)"
+                    ],
+                    correctIndex: 2,
+                    explanation: "Conditional Probability P(A | B) = P(A and B) / P(B). Here P(Claim | VIP) = (VIP and Claim Count) / (Total VIP Count) = 120 / 300 = 0.40 (40%)."
+                }
+            ]
+        },
+        {
+            id: 6,
+            title: "Module 6: Discrete Probability",
+            description: "Expected value E(x), Binomial distribution, and Poisson distribution models.",
+            terms: [
+                { term: "Discrete Random Variable", def: "A random variable that can only take on a finite or countable number of distinct values[cite: 12]." },
+                { term: "Expected Value E(x)", def: "The long-run weighted average outcome of a discrete probability distribution representing the theoretical mean μ[cite: 12]." },
+                { term: "Binomial Distribution", def: "A discrete probability distribution modeling n independent trials with two outcomes and fixed success probability p (calculated via =BINOM.DIST)[cite: 4, 12]." },
+                { term: "Poisson Distribution", def: "A discrete probability distribution modeling event arrivals over a specified interval μ (calculated via =POISSON.DIST)[cite: 4, 12]." },
+                { term: "Bernoulli Trial", def: "A single trial experiment with exactly two possible outcomes: Success or Failure." }
+            ],
+            problems: [
+                {
+                    company: "Aura Retail Group — Stockroom Optimization Lab",
+                    concept: "Discrete Expected Cost Minimization",
+                    text: "Aura Retail stocks premium espresso machines. Weekly demand x has probability: P(0)=0.10, P(1)=0.30, P(2)=0.40, P(3)=0.15, P(4+)=0.05. Each unsold machine costs $50 in holding fees; each stockout (unmet demand) costs $200 in lost profit. If management decides to stock 2 machines, what is the expected weekly cost penalty?",
+                    options: [
+                        "$175.00",
+                        "$75.00",
+                        "$50.00",
+                        "$120.00"
+                    ],
+                    correctIndex: 1,
+                    explanation: "Cost breakdown for stocking 2 units:\n- Demand=0 (2 unsold): $100 × 0.10 = $10\n- Demand=1 (1 unsold): $50 × 0.30 = $15\n- Demand=2 (0 penalty): $0 × 0.40 = $0\n- Demand=3 (1 stockout): $200 × 0.15 = $30\n- Demand=4 (2 stockout): $400 × 0.05 = $20\nTotal Expected Penalty = $10 + $15 + $0 + $30 + $20 = $75.00."
+                },
+                {
+                    company: "Utica Call Center — Arrival Modeling",
+                    concept: "Poisson Distribution Modeling",
+                    text: "Utica Call Center receives an average of μ = 4 support calls per hour during peak shifts. Using Excel function =POISSON.DIST(x, mean, cumulative), what Excel formula calculates the exact probability of receiving 0 calls in a given hour?",
+                    options: [
+                        "=POISSON.DIST(0, 4, FALSE)",
+                        "=POISSON.DIST(4, 0, TRUE)",
+                        "=BINOM.DIST(0, 4, 0.5, FALSE)",
+                        "=POISSON.DIST(0, 4, TRUE)"
+                    ],
+                    correctIndex: 0,
+                    explanation: "For an exact point probability of a Poisson process, set cumulative to FALSE: =POISSON.DIST(0, 4, FALSE). (This yields e^(-4) ≈ 0.0183 or 1.83%)."
+                }
+            ]
+        },
+        {
+            id: 7,
+            title: "Module 7: Continuous Probability",
+            description: "PDFs, Uniform, Normal distribution, Standard Normal (Z-scores), and Monte Carlo simulations.",
+            terms: [
+                { term: "Probability Density Function (PDF)", def: "A mathematical function f(x) describing continuous variables where the total area under the curve equals 1[cite: 11]." },
+                { term: "Normal Distribution", def: "A continuous, symmetrical, bell-shaped distribution completely defined by mean (μ) and standard deviation (σ)[cite: 3, 11]." },
+                { term: "Standard Normal Distribution", def: "A normal distribution with a mean of 0 (μ = 0) and standard deviation of 1 (σ = 1)[cite: 3, 11]." },
+                { term: "Z-Score", def: "The signed number of standard deviations a data point lies above or below the mean: (x - μ) / σ[cite: 3, 11]." },
+                { term: "Uniform Distribution", def: "A continuous probability distribution where probabilities are completely flat and equal across a rectangular range [a, b][cite: 11]." },
+                { term: "Monte Carlo Simulation", def: "Running thousands of randomized trials using probability distributions (like =NORM.INV(RAND())) to model risk under uncertainty[cite: 4, 10, 11, 12]." }
+            ],
+            problems: [
+                {
+                    company: "Utica Express — Freight Delivery Times",
+                    concept: "Continuous Uniform Distribution",
+                    text: "Utica Express delivery times are uniformly distributed between a = 10 minutes and b = 30 minutes. What is the probability density function height f(x), and what is the probability that a delivery takes between 15 and 25 minutes?",
+                    options: [
+                        "f(x) = 0.05; Probability = 50%",
+                        "f(x) = 0.10; Probability = 40%",
+                        "f(x) = 0.05; Probability = 25%",
+                        "f(x) = 0.02; Probability = 50%"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Height f(x) = 1 / (b - a) = 1 / (30 - 10) = 1/20 = 0.05. The probability P(15 ≤ X ≤ 25) = (25 - 15) × f(x) = 10 × 0.05 = 0.50 (50%)."
+                },
+                {
+                    company: "Pioneer Financial — Investment Standard Normal Z-Score",
+                    concept: "Standard Normal Z-Score Standardization",
+                    text: "A stock portfolio has an annual return with mean μ = 8% and standard deviation σ = 15%. What is the Z-score for a year where the portfolio loses 7% (return x = -7%), and what does this Z-score signify?",
+                    options: [
+                        "Z = -1.0; Return is 1.0 standard deviation below the mean",
+                        "Z = +1.0; Return is 1.0 standard deviation above the mean",
+                        "Z = -0.5; Return is 0.5 standard deviation below the mean",
+                        "Z = -1.5; Return is 1.5 standard deviations below the mean"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Z = (x - μ) / σ = (-7% - 8%) / 15% = -15% / 15% = -1.0. A Z-score of -1.0 means the return fell exactly 1 standard deviation below its average."
+                }
+            ]
+        },
+        {
+            id: 8,
+            title: "Module 8: Sampling Distributions",
+            description: "Sampling methods, Central Limit Theorem (CLT), and Standard Error.",
+            terms: [
+                { term: "Sampling", def: "Selecting a portion or subset of a population for observation[cite: 5]." },
+                { term: "Sampling Error", def: "The difference between a sample statistic and the true population parameter[cite: 9]." },
+                { term: "Simple Random Sample", def: "A sample where every item or individual in the population has an equal chance of being selected[cite: 5, 8]." },
+                { term: "Stratified Sampling", def: "Dividing the population into subgroups (strata) and randomly sampling from each[cite: 8]." },
+                { term: "Cluster Sampling", def: "Dividing the population into clusters and randomly selecting entire clusters for analysis." },
+                { term: "Systematic Sampling", def: "Selecting every k-th member from a systematic population list." },
+                { term: "Central Limit Theorem (CLT)", def: "States that for sufficiently large sample sizes (n >= 30), sample means approach a normal distribution regardless of population shape[cite: 8, 9]." },
+                { term: "Standard Error of the Mean", def: "The standard deviation of the sampling distribution of sample means: σ / sqrt(n)[cite: 8, 9]." }
+            ],
+            problems: [
+                {
+                    company: "Aura Pricing Strategy — Sampling & CLT",
+                    concept: "Central Limit Theorem & Standard Error",
+                    text: "Aura Retail's entire catalog has population mean price μ = $51.05 and population standard deviation σ = $18.00. An analyst draws a random sample of n = 36 items. What is the standard error of the sample mean (σ_x̄), and why does the Central Limit Theorem apply?",
+                    options: [
+                        "Standard Error = $3.00; CLT applies because n = 36 ≥ 30",
+                        "Standard Error = $0.50; CLT applies because population is normal",
+                        "Standard Error = $18.00; CLT does not apply",
+                        "Standard Error = $0.83; CLT applies because n = 36 ≥ 30"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Standard Error σ_x̄ = σ / sqrt(n) = $18.00 / sqrt(36) = $18.00 / 6 = $3.00. CLT applies because sample size n = 36 is greater than or equal to 30, guaranteeing the distribution of sample means is approximately normal."
+                }
+            ]
+        },
+        {
+            id: 9,
+            title: "Module 9: Estimation & Confidence Intervals",
+            description: "Point estimates, Margin of error, t-distribution, and Degrees of freedom.",
+            terms: [
+                { term: "Point Estimate", def: "A single numerical value calculated from sample data used to estimate a population parameter." },
+                { term: "Confidence Interval", def: "A range of values constructed from sample data so that the population parameter is likely to fall within it." },
+                { term: "Margin of Error", def: "The maximum expected difference between the true population parameter and the sample estimate." },
+                { term: "Student's t-Distribution", def: "A continuous bell-shaped distribution used when population standard deviation is unknown and sample size is small." },
+                { term: "Degrees of Freedom", def: "The number of independent pieces of information that go into estimating a parameter (df = n - 1)." }
+            ],
+            problems: [
+                {
+                    company: "Utica Quality Control — Battery Lifespan",
+                    concept: "Constructing Confidence Intervals",
+                    text: "A random sample of n = 25 battery batches yields a sample mean life x̄ = 450 hours with sample standard deviation s = 20 hours. Assuming population standard deviation is unknown, what critical distribution should be used, how many degrees of freedom exist, and what is the margin of error at a 95% confidence level (where critical t = 2.064)?",
+                    options: [
+                        "Use z-distribution; df = 25; Margin of error = ±4.0 hours",
+                        "Use Student's t-distribution; df = 24; Margin of error = ±8.256 hours",
+                        "Use Student's t-distribution; df = 25; Margin of error = ±20.0 hours",
+                        "Use F-distribution; df = 24; Margin of error = ±1.96 hours"
+                    ],
+                    correctIndex: 1,
+                    explanation: "Because σ is unknown and sample size is small (n=25), use Student's t-distribution with df = n - 1 = 25 - 1 = 24. Margin of Error = t × (s / sqrt(n)) = 2.064 × (20 / 5) = 2.064 × 4 = 8.256 hours."
+                }
+            ]
+        },
+        {
+            id: 10,
+            title: "Module 10: Hypothesis Testing",
+            description: "Null & Alternative hypotheses, Type I/II errors, p-values, and test statistics.",
+            terms: [
+                { term: "Null Hypothesis (H0)", def: "A statement about a population parameter assumed to be true unless sample evidence proves otherwise." },
+                { term: "Alternative Hypothesis (H1)", def: "A statement accepted if sample evidence provides sufficient proof that the null hypothesis is false." },
+                { term: "Type I Error", def: "Rejecting a null hypothesis (H0) when it is actually true (Alpha risk)." },
+                { term: "Type II Error", def: "Failing to reject a null hypothesis (H0) when it is actually false (Beta risk)." },
+                { term: "p-Value", def: "The probability, assuming H0 is true, of obtaining a test statistic as extreme or more extreme than observed." },
+                { term: "Level of Significance (Alpha)", def: "The maximum probability of making a Type I error set by the researcher prior to testing." },
+                { term: "Test Statistic", def: "A calculated sample value (such as z or t) used to decide whether to reject H0." }
+            ],
+            problems: [
+                {
+                    company: "Utica Foods — Package Weight Compliance",
+                    concept: "Hypothesis Testing & p-Value Decision Rules",
+                    text: "Utica Foods tests whether cereal boxes contain the claimed 16.0 oz average weight. H0: μ = 16.0 oz vs H1: μ ≠ 16.0 oz. A sample of n = 49 boxes yields a calculated z-statistic of 2.33 with an associated two-tailed p-value of 0.0198. If alpha = 0.05, what is the statistical decision?",
+                    options: [
+                        "Fail to reject H0 because p-value (0.0198) < alpha (0.05)",
+                        "Reject H0 because p-value (0.0198) < alpha (0.05); Evidence suggests weight differs from 16.0 oz",
+                        "Accept H0 because z = 2.33 is positive",
+                        "Commit a Type II error automatically"
+                    ],
+                    correctIndex: 1,
+                    explanation: "Decision Rule: If p-value ≤ Alpha, Reject H0. Since 0.0198 < 0.05, we reject the null hypothesis and conclude there is sufficient evidence that the population mean weight differs significantly from 16.0 oz."
+                }
+            ]
+        }
+    ];
+
+    let currentModule = null;
+    let currentMode = 'flashcards';
+    let currentCardIndex = 0;
+    let currentProblemIndex = 0;
+    
+    // Matching Game state
+    let selectedTermCard = null;
+    let selectedDefCard = null;
+    let matchedCount = 0;
+
+    // Elements
+    const menuView = document.getElementById('menu-view');
+    const studyView = document.getElementById('study-view');
+    const moduleGridContainer = document.getElementById('module-grid-container');
+    const currentModuleTitle = document.getElementById('current-module-title');
+    
+    const flashcardContainer = document.getElementById('flashcard-mode-container');
+    const matchingContainer = document.getElementById('matching-mode-container');
+    const problemsContainer = document.getElementById('problems-mode-container');
+    
+    const flashcardEl = document.getElementById('flashcard-el');
+    const cardTerm = document.getElementById('card-term');
+    const cardDef = document.getElementById('card-def');
+    const cardProgress = document.getElementById('card-progress');
+
+    // Build Menu
+    function initMenu() {
+        moduleGridContainer.innerHTML = '';
+        modulesData.forEach(mod => {
+            const card = document.createElement('div');
+            card.className = 'module-card';
+            card.onclick = () => selectModule(mod.id);
+            const probCount = mod.problems ? mod.problems.length : 0;
+            card.innerHTML = `
+                <div>
+                    <h3>${mod.title}</h3>
+                    <p>${mod.description}</p>
+                </div>
+                <div class="card-badges">
+                    <span class="badge">${mod.terms.length} Terms</span>
+                    <span class="badge badge-orange">${probCount} Scenarios</span>
+                </div>
+            `;
+            moduleGridContainer.appendChild(card);
+        });
+    }
+
+    function selectModule(moduleId) {
+        currentModule = modulesData.find(m => m.id === moduleId);
+        currentModuleTitle.innerText = currentModule.title;
+        currentCardIndex = 0;
+        currentProblemIndex = 0;
+        
+        menuView.classList.remove('active');
+        studyView.classList.add('active');
+        
+        setMode('flashcards');
+    }
+
+    function showMenuView() {
+        studyView.classList.remove('active');
+        menuView.classList.add('active');
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('btn-mode-flashcards').classList.toggle('active', mode === 'flashcards');
+        document.getElementById('btn-mode-matching').classList.toggle('active', mode === 'matching');
+        document.getElementById('btn-mode-problems').classList.toggle('active', mode === 'problems');
+        
+        flashcardContainer.style.display = 'none';
+        matchingContainer.style.display = 'none';
+        problemsContainer.style.display = 'none';
+
+        if (mode === 'flashcards') {
+            flashcardContainer.style.display = 'block';
+            renderFlashcard();
+        } else if (mode === 'matching') {
+            matchingContainer.style.display = 'block';
+            initMatchingMode();
+        } else if (mode === 'problems') {
+            problemsContainer.style.display = 'block';
+            renderProblem();
+        }
+    }
+
+    // Flashcard Logic
+    function renderFlashcard() {
+        flashcardEl.classList.remove('flipped');
+        const item = currentModule.terms[currentCardIndex];
+        cardTerm.innerText = item.term;
+        cardDef.innerText = item.def;
+        cardProgress.innerText = `${currentCardIndex + 1} / ${currentModule.terms.length}`;
+    }
+
+    function flipCard() {
+        flashcardEl.classList.toggle('flipped');
+    }
+
+    function nextCard() {
+        currentCardIndex = (currentCardIndex + 1) % currentModule.terms.length;
+        renderFlashcard();
+    }
+
+    function prevCard() {
+        currentCardIndex = (currentCardIndex - 1 + currentModule.terms.length) % currentModule.terms.length;
+        renderFlashcard();
+    }
+
+    // Definition Matching Game Logic
+    function initMatchingMode() {
+        matchedCount = 0;
+        selectedTermCard = null;
+        selectedDefCard = null;
+        
+        const termsCol = document.getElementById('terms-column');
+        const defsCol = document.getElementById('defs-column');
+        
+        termsCol.innerHTML = '';
+        defsCol.innerHTML = '';
+
+        const termsList = shuffleArray([...currentModule.terms]);
+        const defsList = shuffleArray([...currentModule.terms]);
+
+        document.getElementById('matching-score').innerText = `Matches: 0 / ${currentModule.terms.length}`;
+
+        termsList.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'matching-card';
+            card.innerText = item.term;
+            card.dataset.term = item.term;
+            card.onclick = () => handleTermSelect(card, item.term);
+            termsCol.appendChild(card);
+        });
+
+        defsList.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'matching-card';
+            card.innerText = item.def;
+            card.dataset.term = item.term;
+            card.onclick = () => handleDefSelect(card, item.term);
+            defsCol.appendChild(card);
+        });
+    }
+
+    function handleTermSelect(card, termValue) {
+        if (card.classList.contains('matched')) return;
+        if (selectedTermCard) selectedTermCard.classList.remove('selected');
+        
+        selectedTermCard = card;
+        card.classList.add('selected');
+        checkMatch();
+    }
+
+    function handleDefSelect(card, termValue) {
+        if (card.classList.contains('matched')) return;
+        if (selectedDefCard) selectedDefCard.classList.remove('selected');
+        
+        selectedDefCard = card;
+        card.classList.add('selected');
+        checkMatch();
+    }
+
+    function checkMatch() {
+        if (selectedTermCard && selectedDefCard) {
+            const termVal = selectedTermCard.dataset.term;
+            const defVal = selectedDefCard.dataset.term;
+
+            if (termVal === defVal) {
+                selectedTermCard.classList.remove('selected');
+                selectedDefCard.classList.remove('selected');
+                
+                selectedTermCard.classList.add('matched');
+                selectedDefCard.classList.add('matched');
+                
+                selectedTermCard = null;
+                selectedDefCard = null;
+                
+                matchedCount++;
+                document.getElementById('matching-score').innerText = `Matches: ${matchedCount} / ${currentModule.terms.length}`;
+
+                if (matchedCount === currentModule.terms.length) {
+                    setTimeout(() => alert("🎉 Excellent job! You matched all definitions for this module!"), 250);
+                }
+            } else {
+                const termRef = selectedTermCard;
+                const defRef = selectedDefCard;
+                
+                termRef.classList.add('wrong');
+                defRef.classList.add('wrong');
+                
+                setTimeout(() => {
+                    termRef.classList.remove('selected', 'wrong');
+                    defRef.classList.remove('selected', 'wrong');
+                }, 500);
+
+                selectedTermCard = null;
+                selectedDefCard = null;
+            }
+        }
+    }
+
+    // Word Problems Logic
+    function renderProblem() {
+        const problems = currentModule.problems || [];
+        const container = document.getElementById('problems-mode-container');
+
+        if (problems.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-muted);">No scenario problems available for this module yet.</div>`;
+            return;
+        }
+
+        const prob = problems[currentProblemIndex];
+        document.getElementById('problem-progress').innerText = `Scenario Problem ${currentProblemIndex + 1} of ${problems.length}`;
+        document.getElementById('problem-concept').innerText = prob.concept;
+        document.getElementById('problem-company').innerText = prob.company;
+        document.getElementById('problem-text').innerText = prob.text;
+        
+        const explanationBox = document.getElementById('explanation-box');
+        explanationBox.classList.remove('show');
+        document.getElementById('explanation-text').innerText = prob.explanation;
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        const letters = ['A', 'B', 'C', 'D'];
+        prob.options.forEach((optText, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="option-letter">${letters[index]}</span> <span>${optText}</span>`;
+            btn.onclick = () => handleOptionClick(index, prob.correctIndex);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function handleOptionClick(selectedIndex, correctIndex) {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIndex) {
+                btn.classList.add('correct');
+            } else if (idx === selectedIndex) {
+                btn.classList.add('incorrect');
+            }
+        });
+
+        document.getElementById('explanation-box').classList.add('show');
+    }
+
+    function nextProblem() {
+        const problems = currentModule.problems || [];
+        if (problems.length === 0) return;
+        currentProblemIndex = (currentProblemIndex + 1) % problems.length;
+        renderProblem();
+    }
+
+    function prevProblem() {
+        const problems = currentModule.problems || [];
+        if (problems.length === 0) return;
+        currentProblemIndex = (currentProblemIndex - 1 + problems.length) % problems.length;
+        renderProblem();
+    }
+
+    function shuffleArray(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    // Keyboard Navigation for Flashcards & Word Problems
+    document.addEventListener('keydown', (e) => {
+        if (!studyView.classList.contains('active')) return;
+        if (currentMode === 'flashcards') {
+            if (e.key === 'ArrowRight') nextCard();
+            if (e.key === 'ArrowLeft') prevCard();
+            if (e.key === ' ') {
+                e.preventDefault();
+                flipCard();
+            }
+        } else if (currentMode === 'problems') {
+            if (e.key === 'ArrowRight') nextProblem();
+            if (e.key === 'ArrowLeft') prevProblem();
+        }
+    });
+
+    initMenu();
+</script>
+</body>
+</html>
