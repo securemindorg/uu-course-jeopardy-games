@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECN 241: Economic Statistics Practice Exam - Utica University</title>
+    <!-- Include html2pdf library for automated PDF reporting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --utica-navy: #0C223F;
+            --utica-orange: #E65300;
+            --utica-light-bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --correct-green: #10b981;
+            --incorrect-red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--utica-light-bg);
+            color: var(--text-dark);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background-color: var(--utica-navy);
+            color: white;
+            padding: 25px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 5px solid var(--utica-orange);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #cbd5e1;
+            font-size: 1rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+        }
+
+        .section-title {
+            color: var(--utica-navy);
+            font-size: 1.4rem;
+            border-bottom: 2px solid var(--utica-orange);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            background-color: var(--utica-orange);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #c44500;
+        }
+
+        .btn-secondary {
+            background-color: var(--utica-navy);
+        }
+
+        .btn-secondary:hover {
+            background-color: #061426;
+        }
+
+        /* Registration Screen */
+        #reg-screen {
+            text-align: center;
+            max-width: 500px;
+            margin: 40px auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--utica-navy);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--utica-orange);
+        }
+
+        /* Exam Workspace */
+        #exam-screen {
+            display: none;
+        }
+
+        .exam-meta {
+            display: flex;
+            justify-content: space-between;
+            background: var(--utica-navy);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .question-item {
+            background: #fafafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .question-item h4 {
+            color: var(--utica-navy);
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+
+        .matching-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .matching-row select {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            background: white;
+            width: 100%;
+        }
+
+        .scenario-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .scenario-option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .scenario-option-label:hover {
+            background: #eff6ff;
+            border-color: var(--utica-navy);
+        }
+
+        /* Results & Report Styling */
+        #report-screen {
+            display: none;
+        }
+
+        .score-banner {
+            background: var(--utica-navy);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-bottom: 5px solid var(--utica-orange);
+        }
+
+        .score-banner h2 {
+            font-size: 2.5rem;
+            color: var(--utica-orange);
+            margin-top: 10px;
+        }
+
+        .report-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
+        }
+
+        .report-item.correct {
+            border-left: 6px solid var(--correct-green);
+        }
+
+        .report-item.incorrect {
+            border-left: 6px solid var(--incorrect-red);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .badge-correct { background: #d1fae5; color: #065f46; }
+        .badge-incorrect { background: #fee2e2; color: #991b1b; }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .btn { display: none; }
+            .card { border: none; box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="pdf-export-container">
+    <header>
+        <h2>ECN 241: Economic Statistics</h2>
+        <h1>Comprehensive Practice Exam (Modules 1–7)</h1>
+        <p>Utica University • Department of Business and Economics</p>
+    </header>
+
+    <!-- STEP 1: STUDENT REGISTRATION -->
+    <section id="reg-screen" class="card">
+        <h2 style="color: var(--utica-navy); margin-bottom: 15px;">Student Exam Registration</h2>
+        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.95rem;">Please enter your full legal name before starting your practice assessment for Modules 1 through 7.</p>
+        
+        <div class="form-group">
+            <label for="student-name">Full Name:</label>
+            <input type="text" id="student-name" placeholder="e.g., Jane Doe" required>
+        </div>
+        
+        <button class="btn" onclick="startExam()">Start Practice Exam →</button>
+    </section>
+
+    <!-- STEP 2: EXAM WORKSPACE -->
+    <section id="exam-screen">
+        <div class="exam-meta">
+            <div>Student: <span id="display-student-name" style="color: var(--utica-orange);"></span></div>
+            <div>Coverage: Modules 1–7 (48 Definitions & 11 Business Scenarios)</div>
+        </div>
+
+        <!-- SECTION A: DEFINITION MATCHING -->
+        <div class="card">
+            <h3 class="section-title">Section A: Core Definitions Matching</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Match each statistical definition on the left with the correct term using the dropdown selection.</p>
+            <div id="matching-questions-container"></div>
+        </div>
+
+        <!-- SECTION B: SCENARIO WORD PROBLEMS -->
+        <div class="card">
+            <h3 class="section-title">Section B: Business Scenario Problem Solving</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Read each applied business scenario and select the single best analytical response.</p>
+            <div id="scenario-questions-container"></div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="btn" style="font-size: 1.1rem; padding: 15px 35px;" onclick="submitExam()">Submit Exam & Generate Report</button>
+        </div>
+    </section>
+
+    <!-- STEP 3: RESULTS & PDF REPORT SCREEN -->
+    <section id="report-screen">
+        <div class="score-banner">
+            <h3>Official Exam Report Card</h3>
+            <p id="report-student-meta" style="font-size: 1.1rem; margin-top: 5px;"></p>
+            <h2 id="report-final-score">0%</h2>
+            <p id="report-raw-score" style="margin-top: 5px; color: #cbd5e1;"></p>
+        </div>
+
+        <div class="card">
+            <h3 class="section-title">Detailed Itemized Evaluation</h3>
+            <div id="report-items-container"></div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;" id="pdf-action-buttons">
+            <button class="btn" onclick="downloadPDF()">📥 Download Official PDF Report</button>
+            <button class="btn btn-secondary" onclick="location.reload()">🔄 Take Exam Again</button>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Complete Raw Modules Data Array (Modules 1 through 7)
+    const modulesData = [
+        {
+            id: 1,
+            title: "Module 1: What is Statistics",
+            description: "Descriptive vs. Inferential, Population vs. Sample, Data Types & Common Data Traps.",
+            terms: [
+                { term: "Statistics", def: "The science of collecting, organizing, analyzing, presenting, and interpreting data to assist in making more effective decisions." },
+                { term: "Descriptive Statistics", def: "Methods of organizing, summarizing, and presenting data in an informative way (e.g., charts, graphs, averages)." },
+                { term: "Inferential Statistics", def: "Methods used to estimate a property of a population based on a sample (also called statistical inference)." },
+                { term: "Population", def: "A collection of all possible individuals, objects, or measurements of interest." },
+                { term: "Sample", def: "A portion, or part, of the population of interest." },
+                { term: "Qualitative Variable", def: "Non-numeric characteristics where data are sorted into categories (e.g., gender, eye color, state of residence)." },
+                { term: "Quantitative Variable", def: "Numeric characteristics where data are reported numerically (e.g., bank balance, number of employees, height)." },
+                { term: "Discrete Variable", def: "A quantitative variable that can assume only certain values with clear gaps (e.g., number of children: 0, 1, 2)." },
+                { term: "Continuous Variable", def: "A quantitative variable that can assume any value within a specific range (e.g., weight, temperature, time)." },
+                { term: "Selection Bias", def: "A data trap occurring when a sample systematically excludes or favors certain population segments." }
+            ],
+            problems: [
+                {
+                    company: "Aura Retail Group — Store Auditing",
+                    concept: "Inferential vs Descriptive Statistics & Sampling",
+                    text: "Aura Retail operates 250 retail stores across the US. The internal audit team randomly inspects financial records at 10 stores and finds an average cash variance of $45 per week. Management uses this $45 figure to estimate total annual auditing loss across all 250 stores. What statistical methodology did management use, and what constitutes the sample vs. population?",
+                    options: [
+                        "Descriptive statistics; Population = 10 stores, Sample = 250 stores",
+                        "Inferential statistics; Population = All 250 stores, Sample = 10 inspected stores",
+                        "Qualitative analysis; Population = 10 stores, Sample = $45 cash variance",
+                        "Selection bias; Population = 10 stores, Sample = 240 uninspected stores"
+                    ],
+                    correctIndex: 1,
+                    explanation: "Management performed Inferential Statistics because they took data from a smaller subset (Sample of 10 stores) to draw conclusions about the entire organization (Population of 250 stores)."
+                },
+                {
+                    company: "Utica Logistics — Vehicle Tracking",
+                    concept: "Classifying Data Variables",
+                    text: "Utica Logistics tracks four data attributes for its fleet: (1) Fleet ID Number, (2) Fuel Tank Level in Gallons, (3) Number of Deliveries Completed, and (4) Driver Performance Rating (Poor, Good, Excellent). Which correctly identifies the variable types for (2) and (3)?",
+                    options: [
+                        "(2) Continuous Quantitative, (3) Discrete Quantitative",
+                        "(2) Discrete Quantitative, (3) Continuous Quantitative",
+                        "(2) Qualitative Attribute, (3) Discrete Quantitative",
+                        "(2) Continuous Quantitative, (3) Qualitative Attribute"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Fuel level (2) can take on any infinite fractional value within a range (e.g., 14.35 gallons), making it Continuous. The number of completed deliveries (3) is countable whole numbers (0, 1, 2, 3), making it Discrete Quantitative."
+                }
+            ]
+        },
+        {
+            id: 2,
+            title: "Module 2: Architecture of Data",
+            description: "Data provenance, hygiene, ethics, and levels of measurement.",
+            terms: [
+                { term: "Nominal Level", def: "Data sorted into categories with no particular order or ranking (e.g., colors, car brands, yes/no responses)." },
+                { term: "Ordinal Level", def: "Data arranged in order, but differences between data values cannot be determined or are meaningless (e.g., letter grades A, B, C; customer ratings)." },
+                { term: "Interval Level", def: "Ordinal data with meaningful differences between values, but with no true zero point (e.g., Temperature in Fahrenheit or Celsius)." },
+                { term: "Ratio Level", def: "The highest measurement level possessing interval characteristics plus a true zero point representing an absolute absence (e.g., income, sales revenue)." },
+                { term: "Data Provenance", def: "The historical record of data origin, ownership, and transformations over time." },
+                { term: "Data Hygiene", def: "The process of identifying, scrubbing, and correcting inaccurate or corrupt records from a dataset." },
+                { term: "Analysis ToolPak", def: "A built-in Excel add-in program providing data analysis tools for financial and statistical summaries." }
+            ],
+            problems: [
+                {
+                    company: "Mohawk Valley Bank — Loan Classification",
+                    concept: "Levels of Data Measurement",
+                    text: "Mohawk Valley Bank records four fields for loan applicants: (A) Account Number, (B) Credit Score Rank (Low Risk, Medium Risk, High Risk), (C) Temperature of Branch Office in °F, and (D) Annual Business Revenue. What is the level of measurement for Credit Score Rank (B) and Annual Business Revenue (D)?",
+                    options: [
+                        "(B) Nominal, (D) Interval",
+                        "(B) Ordinal, (D) Ratio",
+                        "(B) Interval, (D) Ratio",
+                        "(B) Ordinal, (D) Interval"
+                    ],
+                    correctIndex: 1,
+                    explanation: "Credit Score Rank (B) has a clear natural ordering (Low < Medium < High), but differences between ranks are not uniform numbers, making it Ordinal. Annual Business Revenue (D) has meaningful numeric differences and a true absolute zero ($0 means no revenue), making it Ratio Level."
+                },
+                {
+                    company: "Aura Retail Group — Customer Data Scrubbing",
+                    concept: "Data Hygiene & Ethics",
+                    text: "An analyst discovers that 15% of customer records in the CRM have missing purchase amounts, negative ages (-5 years), or duplicate entries. Before running a sales forecasting model, the analyst removes duplicate records and flags missing values. Which statistical practice does this represent?",
+                    options: [
+                        "Data Hygiene (Data Cleaning)",
+                        "Inferential Sampling Error",
+                        "Qualitative Ordinal Scaling",
+                        "Selection Bias Acceleration"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Data Hygiene involves identifying, scrubbing, and correcting corrupt, incomplete, or inaccurate records before conducting formal analytical modeling."
+                }
+            ]
+        },
+        {
+            id: 3,
+            title: "Module 3: Tables & Visualizations",
+            description: "Frequency distributions, Histograms, Scatterplots, and PivotTables.",
+            terms: [
+                { term: "Frequency Distribution", def: "A tabular summary of data showing the number (frequency) of items in each of several non-overlapping classes." },
+                { term: "Histogram", def: "A graph display of contiguous vertical bars representing class frequencies of continuous quantitative data." },
+                { term: "Scatterplot", def: "A visual diagram plotting pairs of numerical variables on two axes to inspect relationships or correlations." },
+                { term: "PivotTable", def: "An interactive data summarization tool used to aggregate, sort, count, and re-arrange table data dynamically." },
+                { term: "Relative Frequency", def: "The fraction or percentage of total observations belonging to a specific class." },
+                { term: "Cumulative Frequency", def: "The running total of frequencies accumulated across successive classes up to a given boundary." }
+            ],
+            problems: [
+                {
+                    company: "Utica Espresso Corp — Quality Assurance",
+                    concept: "Relative & Cumulative Frequency",
+                    text: "Utica Espresso inspects 200 bags of coffee beans for weight accuracy. The frequency table shows: [15.0 - 15.4 oz: 20 bags], [15.5 - 15.9 oz: 70 bags], [16.0 - 16.4 oz: 90 bags], [16.5 - 16.9 oz: 20 bags]. What is the relative frequency of bags weighing between 15.5 and 15.9 oz, and what is the cumulative relative frequency up to 15.9 oz?",
+                    options: [
+                        "Relative Frequency = 35%; Cumulative Relative Frequency = 45%",
+                        "Relative Frequency = 70%; Cumulative Relative Frequency = 90%",
+                        "Relative Frequency = 45%; Cumulative Relative Frequency = 80%",
+                        "Relative Frequency = 35%; Cumulative Relative Frequency = 80%"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Relative frequency for 15.5-15.9 oz = 70 / 200 = 0.35 (35%). Cumulative frequency up to 15.9 oz includes the first two classes: (20 + 70) / 200 = 90 / 200 = 0.45 (45%)."
+                }
+            ]
+        },
+        {
+            id: 4,
+            title: "Module 4: Exploring Business Data",
+            description: "Measures of location, Skewness, Percentiles, and Quartiles.",
+            terms: [
+                { term: "Arithmetic Mean", def: "The sum of all values divided by the total number of values (μ for population, x̄ for sample); sensitive to extreme outliers." },
+                { term: "Median", def: "The midpoint of values ordered from smallest to largest; not affected by extreme outliers." },
+                { term: "Mode", def: "The value that appears most frequently in a data set." },
+                { term: "Weighted Mean", def: "A mean calculated by assigning weights to each value based on relative importance or frequency." },
+                { term: "Geometric Mean", def: "A specialized mean useful for finding average growth rates over multiple periods in finance and economics." },
+                { term: "Variance", def: "A measure of data dispersion based on the squared deviations from the mean." },
+                { term: "Standard Deviation", def: "The square root of the variance, measuring standard spread around the mean." },
+                { term: "Empirical Rule", def: "States that roughly 68%, 95%, and 99.7% of bell-curve data fall within 1, 2, and 3 standard deviations of mean." },
+                { term: "Positively Skewed (Right-Skewed)", def: "A distribution with a long tail stretching to the right where the mean is pulled higher than the median." },
+                { term: "Negatively Skewed (Left-Skewed)", def: "A distribution with a long tail stretching to the left where the mean is pulled lower than the median." }
+            ],
+            problems: [
+                {
+                    company: "Aura Retail Group — Compensation Audit",
+                    concept: "Mean vs. Median Under Skewness",
+                    text: "Aura Retail analyzes monthly salaries for 50 employees at its headquarters. Analysis ToolPak output reveals: Mean = $81,260, Median = $84,500, Standard Deviation = $12,600. The lowest recorded salary is an outlier intern at $12,000. Is this salary distribution positively or negatively skewed, and which metric best reflects a typical employee salary?",
+                    options: [
+                        "Positively skewed; Use Mean ($81,260)",
+                        "Negatively skewed (left-skewed); Use Median ($84,500)",
+                        "Symmetrical; Use Mean ($81,260)",
+                        "Negatively skewed; Use Mode only"
+                    ],
+                    correctIndex: 1,
+                    explanation: "Because the Mean ($81,260) is lower than the Median ($84,500), the distribution has a left-hand tail pulled down by low outliers (Negatively Skewed). The Median resists extreme outliers and best represents the typical employee salary."
+                },
+                {
+                    company: "Utica Manufacturing — Quality Tolerances",
+                    concept: "The Empirical Rule (68-95-99.7)",
+                    text: "Utica Manufacturing produces steel rods with a mean diameter μ = 10.0 mm and standard deviation σ = 0.2 mm. Assuming rod diameters follow a symmetric bell curve, between what two boundary values will approximately 95% of all manufactured rods lie?",
+                    options: [
+                        "9.8 mm and 10.2 mm",
+                        "9.6 mm and 10.4 mm",
+                        "9.4 mm and 10.6 mm",
+                        "9.0 mm and 11.0 mm"
+                    ],
+                    correctIndex: 1,
+                    explanation: "By the Empirical Rule, roughly 95% of observations fall within ±2 standard deviations of the mean: μ ± 2σ = 10.0 ± 2(0.2) = 10.0 ± 0.4 = [9.6 mm, 10.4 mm]."
+                }
+            ]
+        },
+        {
+            id: 5,
+            title: "Module 5: Probability Concepts",
+            description: "Experiments, Sample Spaces, Addition/Multiplication rules, Contingency tables, and Counting.",
+            terms: [
+                { term: "Sample Space", def: "The set of all possible outcomes of a given experiment." },
+                { term: "Probability", def: "A numerical value between 0 and 1 describing the likelihood that an uncertain event will occur." },
+                { term: "Experiment", def: "A process that leads to the occurrence of one and only one of several possible observations." },
+                { term: "Empirical Probability", def: "Probability based on historical data, experiments, or computer simulations rather than theoretical calculation." },
+                { term: "Complement Rule", def: "Rule used to find the probability of an event not occurring: 1 - P(A)." },
+                { term: "Addition Rule (Probability)", def: "Rule used to calculate P(A or B) = P(A) + P(B) - P(A and B)." },
+                { term: "Multiplication Rule (Probability)", def: "Rule used to calculate joint probability P(A and B) = P(A) * P(B|A)." },
+                { term: "Conditional Probability", def: "The probability of an event occurring given that another event has already occurred: P(A|B)." },
+                { term: "Marginal Probability", def: "Probabilities calculated using row or column totals in a contingency table." },
+                { term: "Permutation", def: "An arrangement of a set of objects where the order of selection MATTERS (e.g., race finish places)." },
+                { term: "Combination", def: "An arrangement of a set of objects where the order of selection DOES NOT matter (e.g., choosing a committee)." }
+            ],
+            problems: [
+                {
+                    company: "Aura E-Commerce — Promotion Bundles",
+                    concept: "Combinations vs Permutations",
+                    text: "Aura Retail's marketing team wants to offer a holiday mystery gift box containing 3 distinct luxury items chosen from a catalog of 8 available products. Order of placement inside the box does not matter. How many unique gift boxes can marketing construct?",
+                    options: [
+                        "56 unique gift boxes",
+                        "336 unique gift boxes",
+                        "24 unique gift boxes",
+                        "512 unique gift boxes"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Since selection order does not matter, use Combinations: C(n, r) = n! / [r!(n-r)!] = 8! / [3!(5!)] = (8 × 7 × 6) / (3 × 2 × 1) = 336 / 6 = 56 combinations (or Excel =COMBIN(8, 3))."
+                },
+                {
+                    company: "Mohawk Insurance — Risk Assessment",
+                    concept: "Conditional Probability from Contingency Tables",
+                    text: "A survey of 1,000 policyholders reveals: 300 are VIP members, 400 submitted a claim this year, and 120 are VIP members who submitted a claim. What is the conditional probability that a randomly chosen policyholder submitted a claim, GIVEN that they are a VIP member: P(Claim | VIP)?",
+                    options: [
+                        "120 / 1000 = 0.12 (12%)",
+                        "120 / 400 = 0.30 (30%)",
+                        "120 / 300 = 0.40 (40%)",
+                        "300 / 1000 = 0.30 (30%)"
+                    ],
+                    correctIndex: 2,
+                    explanation: "Conditional Probability P(A | B) = P(A and B) / P(B). Here P(Claim | VIP) = (VIP and Claim Count) / (Total VIP Count) = 120 / 300 = 0.40 (40%)."
+                }
+            ]
+        },
+        {
+            id: 6,
+            title: "Module 6: Discrete Probability",
+            description: "Expected value E(x), Binomial distribution, and Poisson distribution models.",
+            terms: [
+                { term: "Discrete Random Variable", def: "A random variable that can only take on a finite or countable number of distinct values." },
+                { term: "Expected Value E(x)", def: "The long-run weighted average outcome of a discrete probability distribution representing the theoretical mean μ." },
+                { term: "Binomial Distribution", def: "A discrete probability distribution modeling n independent trials with two outcomes and fixed success probability p (calculated via =BINOM.DIST)." },
+                { term: "Poisson Distribution", def: "A discrete probability distribution modeling event arrivals over a specified interval μ (calculated via =POISSON.DIST)." },
+                { term: "Bernoulli Trial", def: "A single trial experiment with exactly two possible outcomes: Success or Failure." }
+            ],
+            problems: [
+                {
+                    company: "Aura Retail Group — Stockroom Optimization Lab",
+                    concept: "Discrete Expected Cost Minimization",
+                    text: "Aura Retail stocks premium espresso machines. Weekly demand x has probability: P(0)=0.10, P(1)=0.30, P(2)=0.40, P(3)=0.15, P(4+)=0.05. Each unsold machine costs $50 in holding fees; each stockout (unmet demand) costs $200 in lost profit. If management decides to stock 2 machines, what is the expected weekly cost penalty?",
+                    options: [
+                        "$175.00",
+                        "$75.00",
+                        "$50.00",
+                        "$120.00"
+                    ],
+                    correctIndex: 1,
+                    explanation: "Cost breakdown for stocking 2 units:\n- Demand=0 (2 unsold): $100 × 0.10 = $10\n- Demand=1 (1 unsold): $50 × 0.30 = $15\n- Demand=2 (0 penalty): $0 × 0.40 = $0\n- Demand=3 (1 stockout): $200 × 0.15 = $30\n- Demand=4 (2 stockout): $400 × 0.05 = $20\nTotal Expected Penalty = $10 + $15 + $0 + $30 + $20 = $75.00."
+                },
+                {
+                    company: "Utica Call Center — Arrival Modeling",
+                    concept: "Poisson Distribution Modeling",
+                    text: "Utica Call Center receives an average of μ = 4 support calls per hour during peak shifts. Using Excel function =POISSON.DIST(x, mean, cumulative), what Excel formula calculates the exact probability of receiving 0 calls in a given hour?",
+                    options: [
+                        "=POISSON.DIST(0, 4, FALSE)",
+                        "=POISSON.DIST(4, 0, TRUE)",
+                        "=BINOM.DIST(0, 4, 0.5, FALSE)",
+                        "=POISSON.DIST(0, 4, TRUE)"
+                    ],
+                    correctIndex: 0,
+                    explanation: "For an exact point probability of a Poisson process, set cumulative to FALSE: =POISSON.DIST(0, 4, FALSE). (This yields e^(-4) ≈ 0.0183 or 1.83%)."
+                }
+            ]
+        },
+        {
+            id: 7,
+            title: "Module 7: Continuous Probability",
+            description: "PDFs, Uniform, Normal distribution, Standard Normal (Z-scores), and Monte Carlo simulations.",
+            terms: [
+                { term: "Probability Density Function (PDF)", def: "A mathematical function f(x) describing continuous variables where the total area under the curve equals 1." },
+                { term: "Normal Distribution", def: "A continuous, symmetrical, bell-shaped distribution completely defined by mean (μ) and standard deviation (σ)." },
+                { term: "Standard Normal Distribution", def: "A normal distribution with a mean of 0 (μ = 0) and standard deviation of 1 (σ = 1)." },
+                { term: "Z-Score", def: "The signed number of standard deviations a data point lies above or below the mean: (x - μ) / σ." },
+                { term: "Uniform Distribution", def: "A continuous probability distribution where probabilities are completely flat and equal across a rectangular range [a, b]." },
+                { term: "Monte Carlo Simulation", def: "Running thousands of randomized trials using probability distributions (like =NORM.INV(RAND())) to model risk under uncertainty." }
+            ],
+            problems: [
+                {
+                    company: "Utica Express — Freight Delivery Times",
+                    concept: "Continuous Uniform Distribution",
+                    text: "Utica Express delivery times are uniformly distributed between a = 10 minutes and b = 30 minutes. What is the probability density function height f(x), and what is the probability that a delivery takes between 15 and 25 minutes?",
+                    options: [
+                        "f(x) = 0.05; Probability = 50%",
+                        "f(x) = 0.10; Probability = 40%",
+                        "f(x) = 0.05; Probability = 25%",
+                        "f(x) = 0.02; Probability = 50%"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Height f(x) = 1 / (b - a) = 1 / (30 - 10) = 1/20 = 0.05. The probability P(15 ≤ X ≤ 25) = (25 - 15) × f(x) = 10 × 0.05 = 0.50 (50%)."
+                },
+                {
+                    company: "Pioneer Financial — Investment Standard Normal Z-Score",
+                    concept: "Standard Normal Z-Score Standardization",
+                    text: "A stock portfolio has an annual return with mean μ = 8% and standard deviation σ = 15%. What is the Z-score for a year where the portfolio loses 7% (return x = -7%), and what does this Z-score signify?",
+                    options: [
+                        "Z = -1.0; Return is 1.0 standard deviation below the mean",
+                        "Z = +1.0; Return is 1.0 standard deviation above the mean",
+                        "Z = -0.5; Return is 0.5 standard deviation below the mean",
+                        "Z = -1.5; Return is 1.5 standard deviations below the mean"
+                    ],
+                    correctIndex: 0,
+                    explanation: "Z = (x - μ) / σ = (-7% - 8%) / 15% = -15% / 15% = -1.0. A Z-score of -1.0 means the return fell exactly 1 standard deviation below its average."
+                }
+            ]
+        }
+    ];
+
+    // Extract all definitions and scenario problems dynamically from Modules 1-7
+    let allDefinitions = [];
+    let allScenarios = [];
+    
+    modulesData.forEach(mod => {
+        if (mod.terms) {
+            mod.terms.forEach(t => allDefinitions.push(t));
+        }
+        if (mod.problems) {
+            mod.problems.forEach(p => allScenarios.push(p));
+        }
+    });
+
+    let studentFullName = "";
+    let shuffledDefinitions = [];
+    let shuffledScenarios = [];
+
+    function startExam() {
+        const nameInput = document.getElementById('student-name');
+        const name = nameInput.value.trim();
+        if (!name) {
+            alert("Please enter your full name to proceed with the exam.");
+            nameInput.focus();
+            return;
+        }
+
+        studentFullName = name;
+        document.getElementById('display-student-name').innerText = studentFullName;
+
+        document.getElementById('reg-screen').style.display = 'none';
+        document.getElementById('exam-screen').style.display = 'block';
+
+        buildExamWorkspace();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function buildExamWorkspace() {
+        shuffledDefinitions = shuffleArray([...allDefinitions]);
+        shuffledScenarios = shuffleArray([...allScenarios]);
+
+        // Build Section A: Matching
+        const matchingContainer = document.getElementById('matching-questions-container');
+        matchingContainer.innerHTML = '';
+
+        const allTermsList = Array.from(new Set(allDefinitions.map(d => d.term))).sort();
+
+        shuffledDefinitions.forEach((item, index) => {
+            const row = document.createElement('div');
+            row.className = 'matching-row';
+            
+            let optionsHtml = `<option value="">-- Select Matching Term --</option>`;
+            allTermsList.forEach(term => {
+                optionsHtml += `<option value="${term}">${term}</option>`;
+            });
+
+            row.innerHTML = `
+                <div><strong>Definition ${index + 1}:</strong><br><span style="font-size: 0.9rem; color: var(--text-dark);">${item.def}</span></div>
+                <div>
+                    <select id="match-select-${index}">
+                        ${optionsHtml}
+                    </select>
+                </div>
+            `;
+            matchingContainer.appendChild(row);
+        });
+
+        // Build Section B: Scenarios
+        const scenarioContainer = document.getElementById('scenario-questions-container');
+        scenarioContainer.innerHTML = '';
+
+        shuffledScenarios.forEach((prob, index) => {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-item';
+            qDiv.id = `scenario-item-${index}`;
+
+            let optionsHtml = '';
+            const letters = ['A', 'B', 'C', 'D'];
+            prob.options.forEach((optText, optIdx) => {
+                optionsHtml += `
+                    <label class="scenario-option-label">
+                        <input type="radio" name="scenario-q-${index}" value="${optIdx}">
+                        <span><strong>${letters[optIdx]}.</strong> ${optText}</span>
+                    </label>
+                `;
+            });
+
+            qDiv.innerHTML = `
+                <h4>Question ${index + 1}: ${prob.company} (${prob.concept})</h4>
+                <p style="margin-bottom: 12px; font-size: 0.95rem; line-height: 1.5; white-space: pre-line;">${prob.text}</p>
+                <div class="scenario-options">
+                    ${optionsHtml}
+                </div>
+            `;
+            scenarioContainer.appendChild(qDiv);
+        });
+    }
+
+    function submitExam() {
+        if (!confirm("Are you ready to submit your exam and generate your official report card?")) return;
+
+        let totalPoints = shuffledDefinitions.length + shuffledScenarios.length;
+        let earnedPoints = 0;
+        let reportItemsHtml = '';
+
+        // Grade Section A: Definitions Matching
+        shuffledDefinitions.forEach((item, index) => {
+            const selectEl = document.getElementById(`match-select-${index}`);
+            const selectedVal = selectEl ? selectEl.value : "";
+            const isCorrect = (selectedVal === item.term);
+
+            if (isCorrect) earnedPoints++;
+
+            reportItemsHtml += `
+                <div class="report-item ${isCorrect ? 'correct' : 'incorrect'}">
+                    <span class="badge ${isCorrect ? 'badge-correct' : 'badge-incorrect'}">${isCorrect ? 'Correct' : 'Incorrect'}</span>
+                    <h4 style="color: var(--utica-navy); margin-bottom: 6px;">Matching Question ${index + 1}</h4>
+                    <p style="font-size: 0.9rem; margin-bottom: 4px;"><strong>Definition:</strong> ${item.def}</p>
+                    <p style="font-size: 0.9rem; margin-bottom: 4px;"><strong>Your Answer:</strong> ${selectedVal || '<i>No Answer Selected</i>'}</p>
+                    <p style="font-size: 0.9rem; color: ${isCorrect ? '#065f46' : '#991b1b'};"><strong>Correct Term:</strong> ${item.term}</p>
+                </div>
+            `;
+        });
+
+        // Grade Section B: Scenarios
+        shuffledScenarios.forEach((prob, index) => {
+            const selectedRadio = document.querySelector(`input[name="scenario-q-${index}"]:checked`);
+            const selectedVal = selectedRadio ? parseInt(selectedRadio.value) : -1;
+            const isCorrect = (selectedVal === prob.correctIndex);
+
+            if (isCorrect) earnedPoints++;
+
+            const letters = ['A', 'B', 'C', 'D'];
+            const userAnsText = selectedVal !== -1 ? `${letters[selectedVal]}. ${prob.options[selectedVal]}` : '<i>No Answer Selected</i>';
+            const correctAnsText = `${letters[prob.correctIndex]}. ${prob.options[prob.correctIndex]}`;
+
+            reportItemsHtml += `
+                <div class="report-item ${isCorrect ? 'correct' : 'incorrect'}">
+                    <span class="badge ${isCorrect ? 'badge-correct' : 'badge-incorrect'}">${isCorrect ? 'Correct' : 'Incorrect'}</span>
+                    <h4 style="color: var(--utica-navy); margin-bottom: 6px;">Scenario Question ${index + 1}: ${prob.company}</h4>
+                    <p style="font-size: 0.9rem; margin-bottom: 8px; white-space: pre-line;">${prob.text}</p>
+                    <p style="font-size: 0.9rem; margin-bottom: 4px;"><strong>Your Answer:</strong> ${userAnsText}</p>
+                    <p style="font-size: 0.9rem; margin-bottom: 6px; color: #065f46;"><strong>Correct Answer:</strong> ${correctAnsText}</p>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 0.85rem; border: 1px solid var(--border-color); white-space: pre-line;">
+                        <strong>Explanation:</strong> ${prob.explanation}
+                    </div>
+                </div>
+            `;
+        });
+
+        const percentage = Math.round((earnedPoints / totalPoints) * 100);
+
+        // Populate Report Screen
+        const now = new Date();
+        const dateStr = now.toLocaleDateString() + ' at ' + now.toLocaleTimeString();
+        document.getElementById('report-student-meta').innerText = `Student: ${studentFullName} | Submitted: ${dateStr}`;
+        document.getElementById('report-final-score').innerText = `${percentage}%`;
+        document.getElementById('report-raw-score').innerText = `Score: ${earnedPoints} out of ${totalPoints} points correct`;
+        document.getElementById('report-items-container').innerHTML = reportItemsHtml;
+
+        // Switch views
+        document.getElementById('exam-screen').style.display = 'none';
+        document.getElementById('report-screen').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function downloadPDF() {
+        const element = document.getElementById('pdf-export-container');
+        const actionBtns = document.getElementById('pdf-action-buttons');
+        actionBtns.style.display = 'none';
+
+        const opt = {
+            margin:       10,
+            filename:     `ECN241_Exam_Report_${studentFullName.replace(/\s+/g, '_')}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().from(element).set(opt).save().then(() => {
+            actionBtns.style.display = 'block';
+        });
+    }
+
+    function shuffleArray(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+</script>
+</body>
+</html>
