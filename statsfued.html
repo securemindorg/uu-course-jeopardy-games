@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StatFeud: The Hypothesis Testing Showdown | Utica University ECN 241</title>
+    <style>
+        :root {
+            --utica-navy: #0C223F;
+            --utica-navy-light: #163763;
+            --utica-orange: #E65300;
+            --utica-orange-hover: #ff620a;
+            --gold-accent: #F59E0B;
+            --gold-light: #FEF3C7;
+            --bg-dark: #071324;
+            --card-white: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --correct-green: #10b981;
+            --incorrect-red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at top, var(--utica-navy-light) 0%, var(--bg-dark) 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Game Show Header */
+        header {
+            background: rgba(12, 34, 63, 0.95);
+            border-bottom: 4px solid var(--utica-orange);
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-badge {
+            background: var(--utica-orange);
+            color: white;
+            font-weight: 900;
+            padding: 6px 12px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            box-shadow: 0 0 12px rgba(230, 83, 0, 0.6);
+        }
+
+        .brand-title h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #ffffff, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-btn:hover {
+            background: var(--utica-orange);
+            border-color: var(--utica-orange);
+        }
+
+        /* Live Scoreboard Bar */
+        .scoreboard-bar {
+            background: rgba(0, 0, 0, 0.35);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .team-pod {
+            background: linear-gradient(145deg, var(--utica-navy), #08182e);
+            border: 2px solid var(--gold-accent);
+            border-radius: 12px;
+            padding: 10px 18px;
+            min-width: 190px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .team-pod.active-turn {
+            border-color: var(--utica-orange);
+            box-shadow: 0 0 18px rgba(230, 83, 0, 0.65);
+            transform: translateY(-2px);
+        }
+
+        .team-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .team-score {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--gold-accent);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .score-adjusters {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .mini-btn {
+            background: rgba(255,255,255,0.12);
+            border: none;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .mini-btn:hover {
+            background: var(--utica-orange);
+        }
+
+        /* Main Container */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        /* Setup Screen */
+        .setup-panel {
+            background: var(--card-white);
+            color: var(--text-dark);
+            max-width: 620px;
+            margin: 20px auto;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            border-top: 8px solid var(--utica-orange);
+        }
+
+        .setup-panel h2 {
+            color: var(--utica-navy);
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .setup-panel p {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .team-input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .team-input-row label {
+            font-weight: 700;
+            color: var(--utica-navy);
+            width: 85px;
+        }
+
+        .team-input-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .team-input-row input:focus {
+            outline: none;
+            border-color: var(--utica-orange);
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, var(--utica-orange), #c94600);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 6px 15px rgba(230, 83, 0, 0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+            margin-top: 12px;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(230, 83, 0, 0.6);
+        }
+
+        /* Case Files Vault Grid (Deal or No Deal / Showdown Board) */
+        .board-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .board-header h2 {
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .board-header p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .briefcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 18px;
+        }
+
+        .briefcase-card {
+            background: linear-gradient(145deg, #163763, #0C223F);
+            border: 2px solid var(--gold-accent);
+            border-radius: 14px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 155px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+        }
+
+        .briefcase-card:hover:not(.completed) {
+            transform: translateY(-6px) scale(1.02);
+            border-color: var(--utica-orange);
+            box-shadow: 0 12px 28px rgba(230, 83, 0, 0.45);
+        }
+
+        .briefcase-card.completed {
+            opacity: 0.45;
+            border-color: #475569;
+            background: #091526;
+            cursor: default;
+        }
+
+        .case-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .case-number {
+            background: var(--gold-accent);
+            color: var(--utica-navy);
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .case-points {
+            font-weight: 800;
+            color: #fbbf24;
+            font-size: 1rem;
+        }
+
+        .case-topic-tag {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #93c5fd;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .case-company {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .completed-stamp {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-12deg);
+            border: 3px solid var(--correct-green);
+            color: var(--correct-green);
+            font-weight: 900;
+            font-size: 1.2rem;
+            padding: 4px 12px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            background: rgba(7, 19, 36, 0.85);
+        }
+
+        /* Executive Case Brief Modal / Stage */
+        .case-stage {
+            background: var(--card-white);
+            color: var(--text-dark);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border-top: 8px solid var(--utica-orange);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stage-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stage-badges {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .pill-navy {
+            background: var(--utica-navy);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .pill-orange {
+            background: #ffedd5;
+            color: var(--utica-orange);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        /* Lifelines & Timer Bar */
+        .lifeline-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .lifeline-btn {
+            background: var(--utica-navy);
+            color: var(--gold-accent);
+            border: 2px solid var(--gold-accent);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lifeline-btn:hover:not(:disabled) {
+            background: var(--gold-accent);
+            color: var(--utica-navy);
+        }
+
+        .lifeline-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .timer-box {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 900;
+            color: var(--utica-navy);
+            font-size: 1rem;
+            cursor: pointer;
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .timer-box.urgent {
+            background: #fef2f2;
+            border-color: var(--incorrect-red);
+            color: var(--incorrect-red);
+            animation: pulse 0.8s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .scenario-box {
+            background: #f8fafc;
+            border-left: 5px solid var(--utica-navy);
+            padding: 18px 22px;
+            border-radius: 8px;
+            margin-bottom: 22px;
+        }
+
+        .scenario-box h3 {
+            color: var(--utica-navy);
+            font-size: 1.35rem;
+            margin-bottom: 8px;
+        }
+
+        .scenario-box p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #1e293b;
+        }
+
+        .data-snippet {
+            background: #0C223F;
+            color: #f8fafc;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* 4 Options Grid */
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        @media (max-width: 768px) {
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .answer-tile {
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 16px 18px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+        }
+
+        .answer-tile:hover:not(:disabled) {
+            border-color: var(--utica-orange);
+            background: #fff7ed;
+            transform: translateY(-2px);
+        }
+
+        .answer-tile.eliminated {
+            opacity: 0.25;
+            pointer-events: none;
+            text-decoration: line-through;
+        }
+
+        .answer-tile.selected-wrong {
+            background: #fef2f2;
+            border-color: var(--incorrect-red);
+            color: #991b1b;
+        }
+
+        .answer-tile.revealed-correct {
+            background: #ecfdf5;
+            border-color: var(--correct-green);
+            color: #065f46;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+            font-weight: 800;
+        }
+
+        .letter-hex {
+            background: var(--utica-navy);
+            color: var(--gold-accent);
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        /* Boardroom Poll Box */
+        .poll-box {
+            display: none;
+            background: #fffbeb;
+            border: 2px solid var(--gold-accent);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+        }
+
+        .poll-box h4 {
+            color: #92400e;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .poll-bars {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .poll-item {
+            background: white;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #fde68a;
+            font-weight: 800;
+            color: var(--utica-navy);
+        }
+
+        /* Official Verdict Panel */
+        .verdict-panel {
+            display: none;
+            background: #f0fdf4;
+            border: 2px solid var(--correct-green);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        .verdict-panel.show {
+            display: block;
+            animation: slideUp 0.25s ease-out;
+        }
+
+        .verdict-panel h4 {
+            color: #065f46;
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+        }
+
+        .verdict-panel p {
+            color: #1e293b;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .award-bar {
+            background: var(--utica-navy);
+            color: white;
+            padding: 14px 18px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .award-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .award-team-btn {
+            background: var(--utica-orange);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .award-team-btn:hover {
+            background: #ff6a1a;
+        }
+
+        .return-btn {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .return-btn:hover {
+            background: #1e293b;
+        }
+
+        /* Victory Podium Modal */
+        .victory-card {
+            background: var(--card-white);
+            color: var(--text-dark);
+            max-width: 650px;
+            margin: 30px auto;
+            border-radius: 16px;
+            padding: 36px;
+            text-align: center;
+            border-top: 10px solid var(--gold-accent);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .trophy-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand-title">
+        <span class="brand-badge">ECN 241 • UTICA UNIVERSITY</span>
+        <h1>StatFeud: The Hypothesis Showdown</h1>
+    </div>
+    <div class="header-controls">
+        <button class="icon-btn" id="sound-toggle-btn" onclick="toggleSound()">🔊 Sound: ON</button>
+        <button class="icon-btn" onclick="showBoardView()" id="nav-board-btn" style="display:none;">💼 Case Vault</button>
+        <button class="icon-btn" onclick="showVictoryScreen()" id="nav-end-btn" style="display:none;">🏆 Final Podium</button>
+    </div>
+</header>
+
+<!-- LIVE SCOREBOARD -->
+<div class="scoreboard-bar" id="scoreboard-bar" style="display:none;"></div>
+
+<main>
+    <!-- SCREEN 1: TEAM SETUP -->
+    <section id="setup-screen" class="setup-panel">
+        <h2>Boardroom Showdown Setup</h2>
+        <p>Configure 2 to 4 competing consulting teams for today's Hypothesis Testing Showdown.</p>
+
+        <div class="team-input-row">
+            <label>Team 1:</label>
+            <input type="text" id="team-input-0" value="The Alpha Rejectors">
+        </div>
+        <div class="team-input-row">
+            <label>Team 2:</label>
+            <input type="text" id="team-input-1" value="P-Value Pioneers">
+        </div>
+        <div class="team-input-row">
+            <label>Team 3:</label>
+            <input type="text" id="team-input-2" value="Null Terminators" placeholder="(Leave blank for 2 teams)">
+        </div>
+        <div class="team-input-row">
+            <label>Team 4:</label>
+            <input type="text" id="team-input-3" value="" placeholder="(Optional 4th team)">
+        </div>
+
+        <button class="primary-btn" onclick="launchGame()">Enter The Boardroom →</button>
+    </section>
+
+    <!-- SCREEN 2: BRIEFCASE VAULT BOARD -->
+    <section id="board-screen" style="display:none;">
+        <div class="board-header">
+            <h2>Select an Executive Case Brief</h2>
+            <p>Each briefcase holds a high-stakes corporate statistical dilemma. Pick a case to begin!</p>
+        </div>
+        <div class="briefcase-grid" id="briefcase-grid"></div>
+    </section>
+
+    <!-- SCREEN 3: ACTIVE CASE STAGE -->
+    <section id="case-screen" style="display:none;">
+        <div class="case-stage">
+            <div class="stage-topbar">
+                <div class="stage-badges">
+                    <span class="pill-navy" id="stage-case-num">CASE #1</span>
+                    <span class="pill-orange" id="stage-category">HYPOTHESIS SETUP</span>
+                    <span class="pill-navy" style="background:var(--gold-accent); color:var(--utica-navy);" id="stage-points">500 PTS</span>
+                </div>
+                <div class="lifeline-bar">
+                    <button class="lifeline-btn" id="btn-5050" onclick="use5050()">✂️ 50/50</button>
+                    <button class="lifeline-btn" id="btn-poll" onclick="usePoll()">📊 Poll Boardroom</button>
+                    <div class="timer-box" id="timer-display" onclick="toggleTimer()" title="Click to Start/Pause 45s Clock">⏱ 45s</div>
+                </div>
+            </div>
+
+            <div class="scenario-box">
+                <h3 id="stage-company">Company Title</h3>
+                <p id="stage-prompt">Scenario text goes here...</p>
+                <div class="data-snippet" id="stage-snippet" style="display:none;"></div>
+            </div>
+
+            <!-- Boardroom Poll Visual -->
+            <div class="poll-box" id="poll-box">
+                <h4>📊 Live Boardroom Analyst Poll Results:</h4>
+                <div class="poll-bars" id="poll-bars"></div>
+            </div>
+
+            <!-- Answer Choices -->
+            <div class="answers-grid" id="answers-grid"></div>
+
+            <!-- Action Controls -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <button class="return-btn" onclick="showBoardView()">← Back to Case Vault</button>
+                <button class="primary-btn" id="btn-reveal-verdict" style="width:auto; margin-top:0; padding:10px 22px; font-size:0.95rem;" onclick="revealVerdict()">⚖️ Reveal Official Verdict</button>
+            </div>
+
+            <!-- Official Verdict & Point Awarding -->
+            <div class="verdict-panel" id="verdict-panel">
+                <h4>⚖️ Official Statistical Verdict & Executive Analysis</h4>
+                <p id="verdict-explanation"></p>
+
+                <div class="award-bar">
+                    <span style="font-weight:800;">🏆 Award <span id="award-pts-label">500</span> Points To:</span>
+                    <div class="award-buttons" id="award-buttons"></div>
+                    <button class="return-btn" onclick="markCompleteAndReturn()">No Points / Return to Vault →</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCREEN 4: FINAL VICTORY PODIUM -->
+    <section id="victory-screen" style="display:none;">
+        <div class="victory-card">
+            <div class="trophy-icon">🏆</div>
+            <h2 style="color:var(--utica-navy); font-size:2rem; margin-bottom:8px;">Showdown Champions!</h2>
+            <p style="color:var(--text-muted); margin-bottom:24px;">Final Boardroom Standings — ECN 241 Economic Statistics</p>
+            <div id="final-standings-list" style="margin-bottom:28px;"></div>
+            <button class="primary-btn" onclick="location.reload()">Start New Class Game</button>
+        </div>
+    </section>
+</main>
+
+<script>
+    // 12 High-Stakes Business Hypothesis Testing Cases
+    const casesData = [
+        {
+            id: 1,
+            company: "Utica Foods — Cereal Box Fill Audit",
+            category: "Null & Alternative Hypotheses",
+            points: 300,
+            prompt: "Utica Foods advertises 16.0 oz per cereal box. Consumer advocates suspect the packaging line is under-filling boxes on average. Which formal Null (H₀) and Alternative (H₁) hypotheses test this directional claim?",
+            snippet: null,
+            options: [
+                "H₀: μ = 16.0   vs.   H₁: μ ≠ 16.0",
+                "H₀: μ ≥ 16.0   vs.   H₁: μ < 16.0",
+                "H₀: μ ≤ 16.0   vs.   H₁: μ > 16.0",
+                "H₀: x̄ ≥ 16.0   vs.   H₁: x̄ < 16.0"
+            ],
+            correctIndex: 1,
+            explanation: "Because consumer advocates specifically suspect under-filling (less than 16.0 oz), this is a left-tailed test: H₁: μ < 16.0. The Null Hypothesis always contains the equality sign (H₀: μ ≥ 16.0) and always uses population parameter μ, never sample statistic x̄."
+        },
+        {
+            id: 2,
+            company: "Mohawk Valley Pharma — Clinical Trial Risk",
+            category: "Type I vs. Type II Errors",
+            points: 400,
+            prompt: "Mohawk Valley Pharma tests a new blood-pressure drug against the existing standard (H₀: New drug is no better than standard; H₁: New drug is superior). Suppose the new drug actually DOES NOT work any better, yet the clinical trial data accidentally leads executives to approve and launch it. What error occurred?",
+            snippet: "H₀: μ_new ≤ μ_standard   |   H₁: μ_new > μ_standard",
+            options: [
+                "Type I Error (Alpha Risk) — False positive; rejecting a true H₀",
+                "Type II Error (Beta Risk) — False negative; failing to reject a false H₀",
+                "Sampling Frame Bias — Non-random patient selection",
+                "One-Tailed Variance Inflation"
+            ],
+            correctIndex: 0,
+            explanation: "This is a Type I Error (False Alarm / Alpha Risk). H₀ was actually true (the drug had no added benefit), but management rejected H₀ and launched an ineffective drug."
+        },
+        {
+            id: 3,
+            company: "Aura Retail Group — Holiday Ad Campaign",
+            category: "Type I vs. Type II Errors",
+            points: 400,
+            prompt: "Aura Retail ran a $250,000 TikTok ad campaign to boost store traffic (H₀: Campaign had no positive lift; H₁: Campaign increased sales). In reality, the campaign WAS wildly profitable, but noisy sample data led analysts to conclude 'no significant effect' and cancel the ads. What error did Aura Retail commit?",
+            snippet: "Actual Truth: H₁ is True   |   Managerial Decision: Fail to Reject H₀",
+            options: [
+                "Type I Error — Wasting money on a bad campaign",
+                "Type II Error (Beta Risk) — Missing a profitable opportunity by failing to reject a false H₀",
+                "Welch's Degrees of Freedom Error",
+                "P-Value Inversion Error"
+            ],
+            correctIndex: 1,
+            explanation: "Committing a Type II Error (β) means failing to reject H₀ when H₁ is actually true. In business, a Type II error represents a missed opportunity—canceling a winning product or ad campaign."
+        },
+        {
+            id: 4,
+            company: "Utica Enterprises — IT vs. Finance Salaries",
+            category: "Two-Sample t-Test: Equal vs. Unequal Variances",
+            points: 500,
+            prompt: "An HR analyst wants to compare mean annual salaries between the IT Department (n = 241, s² = 2.18 billion) and the Finance Department (n = 120, s² = 3.33 billion). Notice the sample sizes and sample variances differ noticeably. Which Excel Analysis ToolPak test is the safest, standard default choice?",
+            snippet: "IT Variance: $2,180,022,790 (n=241)\nFinance Variance: $3,329,775,761 (n=120)",
+            options: [
+                "t-Test: Paired Two Sample for Means",
+                "t-Test: Two-Sample Assuming Equal Variances (Pooled t-test)",
+                "t-Test: Two-Sample Assuming Unequal Variances (Welch's t-test)",
+                "z-Test: Two Sample for Means with Known Variance"
+            ],
+            correctIndex: 2,
+            explanation: "IT and Finance are two independent groups of employees (not paired), and their variances and sample sizes differ substantially. Welch's t-Test (Two-Sample Assuming Unequal Variances) adjusts degrees of freedom without assuming equal population spread."
+        },
+        {
+            id: 5,
+            company: "Pioneer Logistics — Driver Training Program",
+            category: "Paired vs. Independent t-Tests",
+            points: 400,
+            prompt: "Pioneer Logistics measures fuel efficiency (MPG) for the EXACT SAME 35 delivery trucks before and after installing aerodynamic roof deflectors. Which hypothesis test design must the analyst run in Excel's Analysis ToolPak?",
+            snippet: "Truck #101: Before = 8.2 MPG, After = 9.1 MPG\nTruck #102: Before = 7.9 MPG, After = 8.6 MPG",
+            options: [
+                "t-Test: Two-Sample Assuming Equal Variances",
+                "t-Test: Two-Sample Assuming Unequal Variances",
+                "t-Test: Paired Two Sample for Means",
+                "One-Sample Z-Test for Proportions"
+            ],
+            correctIndex: 2,
+            explanation: "Because both measurements ('Before' and 'After') come from the exact same 35 trucks, the observations are dependent/matched pairs. You must use 't-Test: Paired Two Sample for Means'."
+        },
+        {
+            id: 6,
+            company: "Adirondack Bank — Call Center Hold Times",
+            category: "Interpreting ToolPak p-Values",
+            points: 500,
+            prompt: "Adirondack Bank compares customer hold times (in seconds) between its Utica and Syracuse branches at α = 0.05 (two-tailed). Based on the Excel ToolPak output snippet below, what is the correct statistical verdict?",
+            snippet: "t Stat: -2.418\nP(T<=t) one-tail: 0.0089\nt Critical one-tail: 1.664\nP(T<=t) two-tail: 0.0178\nt Critical two-tail: 1.990",
+            options: [
+                "Fail to Reject H₀ because t Stat (-2.418) is negative",
+                "Reject H₀ because P(T<=t) two-tail (0.0178) ≤ α (0.05)",
+                "Fail to Reject H₀ because 0.0178 > 0.01",
+                "Accept H₀ because t Critical two-tail is 1.990"
+            ],
+            correctIndex: 1,
+            explanation: "For a two-tailed test at α = 0.05, compare 'P(T<=t) two-tail' (0.0178) against α (0.05). Since 0.0178 ≤ 0.05 (and |t Stat| 2.418 > 1.990), we Reject H₀! There is a statistically significant difference in hold times."
+        },
+        {
+            id: 7,
+            company: "Empire Steel — Supplier Tensile Strength",
+            category: "Equal vs. Unequal Variance Selection",
+            points: 600,
+            prompt: "Empire Steel tests two steel suppliers (Vendor X and Vendor Y) with identical sample sizes (n₁ = 30, n₂ = 30). An F-Test Two-Sample for Variances yields F = 1.12 with a two-tailed p-value of 0.76. What does this F-test tell us before running our t-test?",
+            snippet: "F-Test for Variances: F = 1.12, p-value = 0.76 (α = 0.05)",
+            options: [
+                "Variances are significantly different; must use Unequal Variances",
+                "No significant difference in variances (p = 0.76 > 0.05); Equal Variances (Pooled) t-test is appropriate",
+                "Mean strength of Vendor X is 1.12 times higher than Vendor Y",
+                "Both vendors failed quality inspection"
+            ],
+            correctIndex: 1,
+            explanation: "An F-test tests H₀: σ₁² = σ₂². Because p = 0.76 > 0.05, we fail to reject equal variances. Thus, the two suppliers have consistent spread, justifying the 't-Test: Two-Sample Assuming Equal Variances' (Pooled t-test)."
+        },
+        {
+            id: 8,
+            company: "Syracuse E-Commerce — Checkout Redesign",
+            category: "One-Tailed vs. Two-Tailed Hypotheses",
+            points: 500,
+            prompt: "UX designers launch a 1-click checkout button hoping it REDUCES average checkout time compared to the old 45-second checkout. Which hypotheses properly test whether the new button is faster?",
+            snippet: "Old Baseline Mean: 45 seconds",
+            options: [
+                "H₀: μ_new = 45   vs.   H₁: μ_new ≠ 45",
+                "H₀: μ_new ≤ 45   vs.   H₁: μ_new > 45",
+                "H₀: μ_new ≥ 45   vs.   H₁: μ_new < 45",
+                "H₀: μ_new < 45   vs.   H₁: μ_new ≥ 45"
+            ],
+            correctIndex: 2,
+            explanation: "Reducing checkout time means the new average time should be LESS than 45 seconds (H₁: μ_new < 45). The Null Hypothesis represents the opposite status quo (H₀: μ_new ≥ 45)."
+        },
+        {
+            id: 9,
+            company: "Utica Tech — Software Server Uptime",
+            category: "Interpreting ToolPak Output",
+            points: 600,
+            prompt: "Utica Tech tests whether Server Cluster A has higher response latency than Server Cluster B at α = 0.05 (one-tailed). Examine the Excel ToolPak output below. What should the IT Director conclude?",
+            snippet: "Mean Cluster A: 42.5 ms  |  Mean Cluster B: 41.1 ms\nt Stat: 1.482\nP(T<=t) one-tail: 0.0715\nt Critical one-tail: 1.671",
+            options: [
+                "Reject H₀; Cluster A is significantly slower than Cluster B",
+                "Fail to Reject H₀; p-value (0.0715) > α (0.05), so the 1.4 ms difference could be random noise",
+                "Reject H₀ because Mean A (42.5) > Mean B (41.1)",
+                "Commit a Type I Error and replace Cluster A immediately"
+            ],
+            correctIndex: 1,
+            explanation: "Even though Cluster A's sample mean is 1.4 ms higher, its one-tailed p-value is 0.0715, which is greater than α = 0.05 (and t Stat 1.482 < t Critical 1.671). Therefore, we Fail to Reject H₀—there is insufficient evidence of a real difference."
+        },
+        {
+            id: 10,
+            company: "Mohawk Airlines — Overbooking Policy",
+            category: "Balancing Alpha (α) vs. Beta (β) Risk",
+            points: 700,
+            prompt: "When an airline sets its significance level α = 0.01 instead of α = 0.10 to test whether a new aircraft wing sensor is defective (H₀: Sensor is safe; H₁: Sensor is defective), how does lowering α affect error probabilities?",
+            snippet: "α lowered from 0.10 → 0.01",
+            options: [
+                "Lowers Type I error risk (fewer false alarms), but INCREASES Type II error risk (missing a real defect)",
+                "Lowers both Type I and Type II error risks simultaneously",
+                "Increases Type I error risk and eliminates Type II error risk",
+                "Has zero effect on either error type"
+            ],
+            correctIndex: 0,
+            explanation: "Alpha (α) and Beta (β) have an inverse trade-off for a fixed sample size. Making the threshold stricter (α = 0.01) reduces false alarms (Type I), but makes it harder to reject H₀, increasing the risk of missing a real defect (Type II)."
+        },
+        {
+            id: 11,
+            company: "Central NY Grocers — Regional Pricing Audit",
+            category: "Pooled vs. Unpooled Degrees of Freedom",
+            points: 700,
+            prompt: "An analyst compares grocery basket prices across 25 Urban stores and 25 Suburban stores (total N = 50). When running 't-Test: Two-Sample Assuming Equal Variances' in Excel, what will the Degrees of Freedom (df) equal?",
+            snippet: "n₁ = 25 Urban stores   |   n₂ = 25 Suburban stores",
+            options: [
+                "df = 24",
+                "df = 25",
+                "df = 48 (calculated as n₁ + n₂ - 2)",
+                "df = 50"
+            ],
+            correctIndex: 2,
+            explanation: "In a Two-Sample Equal Variances (Pooled) t-test, we estimate two sample means, losing 2 degrees of freedom from the combined sample: df = n₁ + n₂ - 2 = 25 + 25 - 2 = 48."
+        },
+        {
+            id: 12,
+            company: "Utica Investment Partners — Bonus Structure",
+            category: "Statistical vs. Practical Significance",
+            points: 800,
+            prompt: "With a massive sample of n = 50,000 retail transactions, an analyst finds that a new POS terminal speeds up checkout by 0.15 seconds (p = 0.0001). Upgrading all terminals costs $4.2 million. How should an executive interpret this result?",
+            snippet: "n = 50,000 | Mean Time Saved = 0.15 sec | p-value = 0.0001 | Cost = $4.2M",
+            options: [
+                "Statistically significant (p < 0.05), so management must spend the $4.2M immediately",
+                "Statistically significant due to huge sample size, but NOT practically significant enough to justify $4.2M",
+                "Not statistically significant because 0.15 seconds is small",
+                "A Type I error has definitely occurred"
+            ],
+            correctIndex: 1,
+            explanation: "Very large sample sizes (n = 50,000) can detect tiny differences as statistically significant (p = 0.0001). Great business analysts distinguish Statistical Significance from Practical Business Significance—saving 0.15 seconds is not worth $4.2 million!"
+        }
+    ];
+
+    // Game State
+    let teams = [];
+    let currentTurnIndex = 0;
+    let completedCases = new Set();
+    let activeCase = null;
+    let soundEnabled = true;
+    let timerInterval = null;
+    let timeLeft = 45;
+    let timerRunning = false;
+
+    // Web Audio API Synthesizer (No external audio files required!)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTone(type) {
+        if (!soundEnabled) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'ding') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, now); // D5
+            osc.frequency.setValueAtTime(880, now + 0.12); // A5
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+            osc.start(now);
+            osc.stop(now + 0.5);
+        } else if (type === 'buzz') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(140, now);
+            osc.frequency.linearRampToValueAtTime(110, now + 0.35);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            osc.start(now);
+            osc.stop(now + 0.4);
+        } else if (type === 'open') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(330, now);
+            osc.frequency.linearRampToValueAtTime(660, now + 0.2);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        } else if (type === 'fanfare') {
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, idx) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.type = 'triangle';
+                o.connect(g);
+                g.connect(audioCtx.destination);
+                o.frequency.setValueAtTime(freq, now + idx * 0.12);
+                g.gain.setValueAtTime(0.2, now + idx * 0.12);
+                g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.4);
+                o.start(now + idx * 0.12);
+                o.stop(now + idx * 0.12 + 0.4);
+            });
+        }
+    }
+
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        document.getElementById('sound-toggle-btn').innerText = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+    }
+
+    // Launch Game
+    function launchGame() {
+        teams = [];
+        for (let i = 0; i < 4; i++) {
+            const val = document.getElementById(`team-input-${i}`).value.trim();
+            if (val) {
+                teams.push({ name: val, score: 0 });
+            }
+        }
+
+        if (teams.length < 2) {
+            alert("Please enter at least 2 team names to begin the showdown!");
+            return;
+        }
+
+        playTone('fanfare');
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('scoreboard-bar').style.display = 'flex';
+        document.getElementById('nav-board-btn').style.display = 'flex';
+        document.getElementById('nav-end-btn').style.display = 'flex';
+
+        renderScoreboard();
+        showBoardView();
+    }
+
+    function renderScoreboard() {
+        const bar = document.getElementById('scoreboard-bar');
+        bar.innerHTML = '';
+
+        teams.forEach((team, idx) => {
+            const pod = document.createElement('div');
+            pod.className = `team-pod ${idx === currentTurnIndex ? 'active-turn' : ''}`;
+            pod.onclick = () => { currentTurnIndex = idx; renderScoreboard(); };
+            pod.style.cursor = 'pointer';
+            pod.title = 'Click to set active team turn';
+
+            pod.innerHTML = `
+                <div class="team-name">${idx === currentTurnIndex ? '▶ ' : ''}${team.name}</div>
+                <div class="team-score">${team.score}</div>
+                <div class="score-adjusters" onclick="event.stopPropagation()">
+                    <button class="mini-btn" onclick="adjustScore(${idx}, 100)">+100</button>
+                    <button class="mini-btn" onclick="adjustScore(${idx}, -100)">-100</button>
+                </div>
+            `;
+            bar.appendChild(pod);
+        });
+    }
+
+    function adjustScore(teamIdx, delta) {
+        teams[teamIdx].score += delta;
+        if (delta > 0) playTone('ding');
+        renderScoreboard();
+    }
+
+    function showBoardView() {
+        stopTimer();
+        document.getElementById('case-screen').style.display = 'none';
+        document.getElementById('victory-screen').style.display = 'none';
+        document.getElementById('board-screen').style.display = 'block';
+        renderBriefcaseGrid();
+    }
+
+    function renderBriefcaseGrid() {
+        const grid = document.getElementById('briefcase-grid');
+        grid.innerHTML = '';
+
+        casesData.forEach(c => {
+            const isDone = completedCases.has(c.id);
+            const card = document.createElement('div');
+            card.className = `briefcase-card ${isDone ? 'completed' : ''}`;
+            if (!isDone) {
+                card.onclick = () => openCase(c.id);
+            }
+
+            card.innerHTML = `
+                <div>
+                    <div class="case-top">
+                        <span class="case-number">CASE #${c.id}</span>
+                        <span class="case-points">${c.points} PTS</span>
+                    </div>
+                    <div class="case-topic-tag">${c.category}</div>
+                    <div class="case-company">${c.company}</div>
+                </div>
+                ${isDone ? '<div class="completed-stamp">SOLVED</div>' : '<div style="font-size:0.8rem; color:#94a3b8; margin-top:10px;">Click to open dossier →</div>'}
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function openCase(caseId) {
+        activeCase = casesData.find(c => c.id === caseId);
+        if (!activeCase) return;
+
+        playTone('open');
+        document.getElementById('board-screen').style.display = 'none';
+        document.getElementById('case-screen').style.display = 'block';
+
+        // Populate Stage
+        document.getElementById('stage-case-num').innerText = `CASE #${activeCase.id}`;
+        document.getElementById('stage-category').innerText = activeCase.category;
+        document.getElementById('stage-points').innerText = `${activeCase.points} PTS`;
+        document.getElementById('stage-company').innerText = activeCase.company;
+        document.getElementById('stage-prompt').innerText = activeCase.prompt;
+
+        const snippetEl = document.getElementById('stage-snippet');
+        if (activeCase.snippet) {
+            snippetEl.style.display = 'block';
+            snippetEl.innerText = activeCase.snippet;
+        } else {
+            snippetEl.style.display = 'none';
+        }
+
+        // Reset Lifelines & Timer
+        document.getElementById('btn-5050').disabled = false;
+        document.getElementById('btn-poll').disabled = false;
+        document.getElementById('poll-box').style.display = 'none';
+        document.getElementById('verdict-panel').classList.remove('show');
+        document.getElementById('btn-reveal-verdict').style.display = 'inline-block';
+
+        resetTimer();
+
+        // Render Answer Tiles
+        const grid = document.getElementById('answers-grid');
+        grid.innerHTML = '';
+        const letters = ['A', 'B', 'C', 'D'];
+
+        activeCase.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'answer-tile';
+            btn.id = `ans-tile-${idx}`;
+            btn.onclick = () => selectAnswer(idx);
+            btn.innerHTML = `
+                <span class="letter-hex">${letters[idx]}</span>
+                <span>${opt}</span>
+            `;
+            grid.appendChild(btn);
+        });
+    }
+
+    function selectAnswer(selectedIdx) {
+        const tile = document.getElementById(`ans-tile-${selectedIdx}`);
+        if (selectedIdx === activeCase.correctIndex) {
+            tile.classList.add('revealed-correct');
+            playTone('ding');
+            revealVerdict();
+        } else {
+            tile.classList.add('selected-wrong');
+            tile.disabled = true;
+            playTone('buzz');
+        }
+    }
+
+    function use5050() {
+        document.getElementById('btn-5050').disabled = true;
+        playTone('open');
+        const wrongIndices = [0, 1, 2, 3].filter(i => i !== activeCase.correctIndex);
+        // Shuffle and eliminate 2 wrong options
+        wrongIndices.sort(() => Math.random() - 0.5);
+        document.getElementById(`ans-tile-${wrongIndices[0]}`).classList.add('eliminated');
+        document.getElementById(`ans-tile-${wrongIndices[1]}`).classList.add('eliminated');
+    }
+
+    function usePoll() {
+        document.getElementById('btn-poll').disabled = true;
+        playTone('open');
+        const pollBox = document.getElementById('poll-box');
+        const bars = document.getElementById('poll-bars');
+        pollBox.style.display = 'block';
+
+        // Generate realistic audience poll favoring the right answer
+        const weights = [10, 10, 10, 10];
+        weights[activeCase.correctIndex] = 62;
+        // Adjust remaining slightly
+        let rem = 38;
+        [0,1,2,3].forEach(i => {
+            if (i !== activeCase.correctIndex) {
+                const share = Math.floor(Math.random() * (rem / 2));
+                weights[i] = share;
+                rem -= share;
+            }
+        });
+        // Add leftover to another option
+        const other = [0,1,2,3].find(i => i !== activeCase.correctIndex);
+        weights[other] += rem;
+
+        const letters = ['A', 'B', 'C', 'D'];
+        bars.innerHTML = letters.map((L, i) => `
+            <div class="poll-item">Option ${L}<br><span style="color:var(--utica-orange); font-size:1.2rem;">${weights[i]}%</span></div>
+        `).join('');
+    }
+
+    function revealVerdict() {
+        stopTimer();
+        document.getElementById('btn-reveal-verdict').style.display = 'none';
+        const correctTile = document.getElementById(`ans-tile-${activeCase.correctIndex}`);
+        correctTile.classList.add('revealed-correct');
+
+        // Disable all tiles
+        for (let i = 0; i < 4; i++) {
+            document.getElementById(`ans-tile-${i}`).disabled = true;
+        }
+
+        document.getElementById('verdict-explanation').innerText = activeCase.explanation;
+        document.getElementById('award-pts-label').innerText = activeCase.points;
+
+        // Build team award buttons
+        const awardContainer = document.getElementById('award-buttons');
+        awardContainer.innerHTML = '';
+        teams.forEach((team, idx) => {
+            const b = document.createElement('button');
+            b.className = 'award-team-btn';
+            b.innerText = `+${activeCase.points} ${team.name}`;
+            b.onclick = () => {
+                teams[idx].score += activeCase.points;
+                currentTurnIndex = (idx + 1) % teams.length;
+                playTone('fanfare');
+                renderScoreboard();
+                markCompleteAndReturn();
+            };
+            awardContainer.appendChild(b);
+        });
+
+        document.getElementById('verdict-panel').classList.add('show');
+    }
+
+    function markCompleteAndReturn() {
+        if (activeCase) {
+            completedCases.add(activeCase.id);
+        }
+        if (completedCases.size === casesData.length) {
+            showVictoryScreen();
+        } else {
+            showBoardView();
+        }
+    }
+
+    // Countdown Timer Logic
+    function resetTimer() {
+        stopTimer();
+        timeLeft = 45;
+        const el = document.getElementById('timer-display');
+        el.innerText = `⏱ ${timeLeft}s`;
+        el.classList.remove('urgent');
+    }
+
+    function toggleTimer() {
+        if (timerRunning) {
+            stopTimer();
+        } else {
+            timerRunning = true;
+            const el = document.getElementById('timer-display');
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                el.innerText = `⏱ ${timeLeft}s`;
+                if (timeLeft <= 10) el.classList.add('urgent');
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    playTone('buzz');
+                    el.innerText = "⏰ TIME!";
+                }
+            }, 1000);
+        }
+    }
+
+    function stopTimer() {
+        timerRunning = false;
+        if (timerInterval) clearInterval(timerInterval);
+    }
+
+    function showVictoryScreen() {
+        stopTimer();
+        playTone('fanfare');
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('board-screen').style.display = 'none';
+        document.getElementById('case-screen').style.display = 'none';
+        document.getElementById('victory-screen').style.display = 'block';
+
+        const sorted = [...teams].sort((a, b) => b.score - a.score);
+        const list = document.getElementById('final-standings-list');
+        list.innerHTML = sorted.map((t, idx) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 20px; margin-bottom:10px; border-radius:10px; background:${idx === 0 ? '#fef3c7' : '#f1f5f9'}; border:2px solid ${idx === 0 ? '#f59e0b' : '#cbd5e1'}; font-weight:800; font-size:1.15rem;">
+                <span>${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}${t.name}</span>
+                <span style="color:var(--utica-orange);">${t.score} PTS</span>
+            </div>
+        `).join('');
+    }
+</script>
+</body>
+</html>
