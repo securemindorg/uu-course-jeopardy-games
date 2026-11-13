@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spot the Hype | Management of Technology Due-Diligence Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* Custom animations and projector-friendly enhancements */
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.25);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
+      }
+    }
+
+    .animate-fade-up {
+      animation: fadeSlideUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .buzzword {
+      background: linear-gradient(120deg, rgba(254, 240, 138, 0.85) 0%, rgba(253, 224, 71, 0.55) 100%);
+      color: #713f12;
+      padding: 0.08rem 0.42rem;
+      border-radius: 0.375rem;
+      font-weight: 700;
+      border-bottom: 2px solid #eab308;
+      display: inline-block;
+    }
+
+    /* Projector Mode scales up base typography & spacing for back-of-room legibility */
+    body.projector-mode {
+      font-size: 1.15rem;
+    }
+    body.projector-mode .pitch-quote {
+      font-size: 1.45rem;
+      line-height: 1.65;
+    }
+    body.projector-mode .option-title {
+      font-size: 1.2rem;
+    }
+
+    /* Smooth custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-600 selection:text-white">
+
+  <!-- Top Executive Navigation / Scoreboard Header -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-inner border border-indigo-400/30">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight">SPOT THE HYPE</h1>
+            <span class="hidden sm:inline-block text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+              CIO Due-Diligence Lab
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 hidden md:block">Management of Technology • Separating AI Reality from Vendor Marketing</p>
+        </div>
+      </div>
+
+      <!-- Classroom Controls & Live Scoreboard -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Classroom Multi-Team Mode Toggle -->
+        <button
+          id="teamModeBtn"
+          onclick="toggleTeamMode()"
+          class="px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
+          title="Toggle side-by-side Team A vs Team B classroom scoreboard"
+        >
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span id="teamModeLabel">Teams: Off</span>
+        </button>
+
+        <!-- Projector Mode Toggle -->
+        <button
+          id="projectorBtn"
+          onclick="toggleProjectorMode()"
+          class="px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
+          title="Enlarge text and contrast for classroom projection"
+        >
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <span id="projectorLabel">Projector</span>
+        </button>
+
+        <!-- Score Pill (Single / Class Mode) -->
+        <div id="singleScoreBadge" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 flex items-center gap-3">
+          <div class="text-right">
+            <span class="text-[10px] uppercase tracking-wider text-slate-400 block leading-none">Score</span>
+            <span id="headerScore" class="font-mono font-bold text-base sm:text-lg text-emerald-400">0 / 0</span>
+          </div>
+          <div class="h-6 w-px bg-slate-700"></div>
+          <div class="text-right">
+            <span class="text-[10px] uppercase tracking-wider text-slate-400 block leading-none">Streak</span>
+            <span id="headerStreak" class="font-mono font-bold text-base sm:text-lg text-amber-400">0🔥</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional Classroom Team Scoreboard Bar (Visible when Team Mode is toggled ON) -->
+    <div id="teamScoreboardBar" class="hidden bg-slate-950/90 border-t border-slate-800 px-4 py-2.5">
+      <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <span class="font-semibold text-indigo-300 uppercase tracking-wider">Classroom Team Tracker:</span>
+          <span>Award points manually to competing student committees after each reveal!</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Team A -->
+          <div class="flex items-center gap-2 bg-slate-900 border border-indigo-500/40 rounded-xl px-3 py-1">
+            <span class="text-xs font-bold text-indigo-300">Team A</span>
+            <span id="teamAScore" class="font-mono font-bold text-white text-sm px-1.5">0</span>
+            <button onclick="adjustTeamScore('A', 1)" class="w-6 h-6 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center cursor-pointer">+</button>
+            <button onclick="adjustTeamScore('A', -1)" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs flex items-center justify-center cursor-pointer">-</button>
+          </div>
+          <!-- Team B -->
+          <div class="flex items-center gap-2 bg-slate-900 border border-emerald-500/40 rounded-xl px-3 py-1">
+            <span class="text-xs font-bold text-emerald-300">Team B</span>
+            <span id="teamBScore" class="font-mono font-bold text-white text-sm px-1.5">0</span>
+            <button onclick="adjustTeamScore('B', 1)" class="w-6 h-6 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center cursor-pointer">+</button>
+            <button onclick="adjustTeamScore('B', -1)" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs flex items-center justify-center cursor-pointer">-</button>
+          </div>
+          <!-- Team C -->
+          <div class="flex items-center gap-2 bg-slate-900 border border-amber-500/40 rounded-xl px-3 py-1">
+            <span class="text-xs font-bold text-amber-300">Team C</span>
+            <span id="teamCScore" class="font-mono font-bold text-white text-sm px-1.5">0</span>
+            <button onclick="adjustTeamScore('C', 1)" class="w-6 h-6 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center justify-center cursor-pointer">+</button>
+            <button onclick="adjustTeamScore('C', -1)" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs flex items-center justify-center cursor-pointer">-</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col justify-center">
+
+    <!-- SCREEN 1: INTRO / BRIEFING SCREEN -->
+    <section id="introScreen" class="animate-fade-up bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden">
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 sm:p-10 text-white">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-semibold uppercase tracking-wider mb-4">
+          <span>Executive Briefing</span>
+          <span>•</span>
+          <span>10 Real-World Cases</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+          Welcome to the CIO Due-Diligence Committee.
+        </h2>
+        <p class="text-slate-300 text-base sm:text-lg max-w-3xl leading-relaxed">
+          Every software vendor claims their product is powered by <span class="text-amber-300 font-semibold">"revolutionary AI."</span> Your job as Technology Managers is to look past the buzzwords, identify what technology is <em>actually</em> under the hood, and spot costly "AI washing" before signing an enterprise contract.
+        </p>
+      </div>
+
+      <div class="p-6 sm:p-10 space-y-8">
+        <!-- Tech Spectrum Cheat Sheet for Students -->
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">The Technology Spectrum You Will Evaluate</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+              <div class="font-bold text-slate-900 text-sm mb-1">1. Rule-Based & Traditional Logic</div>
+              <p class="text-xs text-slate-600 leading-relaxed">Deterministic <code class="font-mono text-indigo-600">if/then</code> rules, keyword matching, and basic sensor thresholds. Fast and cheap, but not AI.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+              <div class="font-bold text-slate-900 text-sm mb-1">2. Operations Research & Optimization</div>
+              <p class="text-xs text-slate-600 leading-relaxed">Mathematical heuristics & combinatorial optimization (e.g., routing, scheduling). Solves massive math problems without neural nets.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+              <div class="font-bold text-slate-900 text-sm mb-1">3. Predictive Machine Learning</div>
+              <p class="text-xs text-slate-600 leading-relaxed">Supervised/unsupervised models trained on historical tabular data to score risk, detect fraud, or recommend items.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+              <div class="font-bold text-slate-900 text-sm mb-1">4. Computer Vision & Robotics (RL)</div>
+              <p class="text-xs text-slate-600 leading-relaxed">Models interpreting camera feeds, spatial sensors, or learning physical actions via Reinforcement Learning.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+              <div class="font-bold text-slate-900 text-sm mb-1">5. Generative AI & LLMs</div>
+              <p class="text-xs text-slate-600 leading-relaxed">Foundation models generating text, code, or images. Powerful for unstructured synthesis, but prone to hallucinations.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200">
+              <div class="font-bold text-amber-900 text-sm mb-1">6. "AI Washing" / Human-in-the-Loop</div>
+              <p class="text-xs text-amber-800 leading-relaxed">Systems marketed as autonomous AI that secretly rely on manual human contractors or legacy scripts behind the curtain.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Launch Controls -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100">
+          <div class="flex items-center gap-3 text-sm text-slate-600">
+            <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">?</span>
+            <span>Discuss each vendor pitch as a class or in teams before locking in your verdict.</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <button
+              onclick="startGame(true)"
+              class="w-full sm:w-auto px-5 py-3.5 rounded-2xl font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition cursor-pointer text-sm"
+            >
+              Shuffle Order
+            </button>
+            <button
+              onclick="startGame(false)"
+              class="w-full sm:w-auto px-8 py-3.5 rounded-2xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/25 transition transform active:scale-[0.99] cursor-pointer text-base flex items-center justify-center gap-2"
+            >
+              <span>Start Due-Diligence Audit</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: ACTIVE SCENARIO GAMEPLAY -->
+    <section id="gameScreen" class="hidden space-y-6">
+      <!-- Progress Bar & Case Metadata -->
+      <div class="bg-white rounded-2xl px-5 py-3.5 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span id="caseCounterBadge" class="font-mono text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200">
+            Case 1 of 10
+          </span>
+          <span id="industryTag" class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Retail &amp; Physical Commerce
+          </span>
+        </div>
+
+        <!-- Progress Track -->
+        <div class="flex items-center gap-3 flex-1 max-w-xs sm:max-w-sm">
+          <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/60">
+            <div id="progressBar" class="bg-indigo-600 h-full transition-all duration-500 rounded-full" style="width: 10%"></div>
+          </div>
+          <span id="progressPercent" class="font-mono text-xs font-semibold text-slate-500">10%</span>
+        </div>
+      </div>
+
+      <!-- Vendor Pitch / Press Release Card -->
+      <div id="pitchCard" class="animate-fade-up bg-white rounded-3xl shadow-lg border border-slate-200/90 overflow-hidden">
+        <div class="bg-slate-900 px-6 py-4 flex flex-wrap items-center justify-between gap-2 border-b border-slate-800">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <span class="ml-2 font-mono text-xs text-slate-400 uppercase tracking-wider">Vendor Pitch / Public Press Release</span>
+          </div>
+          <span id="realWorldCaseRef" class="text-xs font-medium text-indigo-300 bg-indigo-950/80 border border-indigo-700/50 px-2.5 py-0.5 rounded-full">
+            Case Reference
+          </span>
+        </div>
+
+        <div class="p-6 sm:p-8">
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <h2 id="scenarioTitle" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                Amazon Go — "Just Walk Out" Autonomous Checkout
+              </h2>
+              <p id="scenarioSubtitle" class="text-sm text-slate-500 mt-0.5">
+                Enterprise Retail Transformation Pitch
+              </p>
+            </div>
+            <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
+              <svg class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              Highlighted = Marketing Buzzwords
+            </span>
+          </div>
+
+          <!-- Quoted Marketing Pitch -->
+          <blockquote class="relative bg-slate-50 border-l-4 border-indigo-600 rounded-r-2xl p-5 sm:p-6 text-slate-800 pitch-quote text-base sm:text-lg leading-relaxed font-medium">
+            <p id="vendorPitchText"></p>
+          </blockquote>
+        </div>
+      </div>
+
+      <!-- Multiple Choice Options Section -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-slate-900 text-white text-xs font-mono flex items-center justify-center">?</span>
+            <span>Committee Verdict: What is ACTUALLY under the hood?</span>
+          </h3>
+          <span id="selectionHint" class="text-xs text-slate-500 font-medium">Select an option to lock in your audit</span>
+        </div>
+
+        <div id="optionsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          <!-- Options injected via JS -->
+        </div>
+      </div>
+
+      <!-- CIO Due-Diligence Breakdown Panel (Revealed After Answering) -->
+      <div id="feedbackPanel" class="hidden animate-fade-up rounded-3xl overflow-hidden shadow-xl border-2">
+        <!-- Top Status Banner -->
+        <div id="feedbackHeader" class="px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div id="feedbackIcon" class="w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-xl shrink-0"></div>
+            <div>
+              <div id="feedbackVerdictTitle" class="font-extrabold text-lg sm:text-xl tracking-tight"></div>
+              <div id="feedbackTechTag" class="text-xs sm:text-sm font-mono font-semibold opacity-90"></div>
+            </div>
+          </div>
+          <span id="hypeMeterBadge" class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm"></span>
+        </div>
+
+        <!-- Detailed Management Breakdown Body -->
+        <div class="bg-white p-6 sm:p-8 space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Under the Hood -->
+            <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200/80">
+              <div class="flex items-center gap-2 text-indigo-700 font-bold text-sm uppercase tracking-wider mb-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>What's Actually Under the Hood</span>
+              </div>
+              <p id="underTheHoodText" class="text-slate-700 text-sm sm:text-base leading-relaxed"></p>
+            </div>
+
+            <!-- Why It Matters for Managers -->
+            <div class="bg-amber-50/60 rounded-2xl p-5 border border-amber-200/80">
+              <div class="flex items-center gap-2 text-amber-900 font-bold text-sm uppercase tracking-wider mb-2">
+                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Strategic Management Takeaway</span>
+              </div>
+              <p id="managerTakeawayText" class="text-slate-800 text-sm sm:text-base leading-relaxed"></p>
+            </div>
+          </div>
+
+          <!-- Due Diligence Questions to Ask the Vendor -->
+          <div class="bg-slate-900 text-white rounded-2xl p-5 sm:p-6">
+            <div class="flex items-center gap-2 text-indigo-300 font-bold text-xs sm:text-sm uppercase tracking-wider mb-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Sharp Questions to Ask the Vendor Before Signing</span>
+            </div>
+            <ul id="vendorQuestionsList" class="space-y-2.5 text-sm sm:text-base text-slate-200">
+              <!-- Questions injected via JS -->
+            </ul>
+          </div>
+
+          <!-- Next Case Button -->
+          <div class="flex justify-end pt-2">
+            <button
+              id="nextCaseBtn"
+              onclick="nextScenario()"
+              class="w-full sm:w-auto px-7 py-3.5 rounded-2xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/25 transition flex items-center justify-center gap-2 cursor-pointer text-base"
+            >
+              <span id="nextCaseBtnText">Next Vendor Pitch</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: END-OF-GAME CIO EXECUTIVE SUMMARY -->
+    <section id="summaryScreen" class="hidden animate-fade-up bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden">
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 sm:p-10 text-white">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="inline-block text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 mb-3">
+              Due-Diligence Audit Complete
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">CIO Executive Briefing</h2>
+            <p id="rankSubtitle" class="text-indigo-200 text-base sm:text-lg mt-1 font-medium">
+              Chief Technology Strategist
+            </p>
+          </div>
+
+          <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl px-6 py-4 text-center">
+            <span class="text-xs uppercase tracking-wider text-slate-300 block">Final Accuracy</span>
+            <span id="finalScoreDisplay" class="font-mono text-3xl sm:text-4xl font-extrabold text-emerald-400">8 / 10</span>
+            <span id="finalPercentDisplay" class="block text-xs font-mono text-slate-300 mt-0.5">80% Hype-Proof</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 sm:p-10 space-y-8">
+        <!-- Category Mastery Breakdown -->
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Audit Results by Case</h3>
+          <div id="caseReviewGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- Summary pills injected via JS -->
+          </div>
+        </div>
+
+        <!-- Classroom Wrap-Up Discussion Prompts -->
+        <div class="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-6">
+          <div class="flex items-center gap-2 text-indigo-900 font-extrabold text-base sm:text-lg mb-3">
+            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+            </svg>
+            <span>5-Minute Class Wrap-Up Discussion Prompts</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-2.5 text-sm sm:text-base text-slate-800 leading-relaxed">
+            <li><strong>The "LLM Hammer" Problem:</strong> Why do so many companies try to force Generative AI/LLMs onto problems better solved by Predictive ML or Operations Research?</li>
+            <li><strong>Cost vs. Interpretability:</strong> In regulated industries (banking, healthcare, HR), why might a simple logistic regression or rule-based model beat a deep neural network?</li>
+            <li><strong>Spotting "AI Washing":</strong> What is the biggest red flag in a vendor's sales deck that signals human-in-the-loop labor or basic automation disguised as AI?</li>
+          </ol>
+        </div>
+
+        <!-- Replay Actions -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-100">
+          <button
+            onclick="returnToIntro()"
+            class="px-5 py-3 rounded-2xl font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition cursor-pointer text-sm"
+          >
+            Back to Briefing
+          </button>
+          <div class="flex flex-wrap gap-3">
+            <button
+              onclick="startGame(false)"
+              class="px-5 py-3 rounded-2xl font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition cursor-pointer text-sm"
+            >
+              Replay Same Order
+            </button>
+            <button
+              onclick="startGame(true)"
+              class="px-7 py-3 rounded-2xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/25 transition cursor-pointer text-sm flex items-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Shuffle &amp; Play Again</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Subtle Footer -->
+  <footer class="py-4 px-6 text-center text-xs text-slate-400">
+    Management of Technology Interactive Exercise • Built for Classroom &amp; Executive Education
+  </footer>
+
+  <!-- Game Data & Application Logic -->
+  <script>
+    /**
+     * Real-world and industry-inspired scenarios illustrating the spectrum of
+     * traditional software, operations research, predictive ML, computer vision,
+     * generative AI/LLMs, and "AI washing" / human-in-the-loop systems.
+     */
+    const SCENARIOS = [
+      {
+        id: 1,
+        industry: "Retail & Physical Commerce",
+        reference: "Real-World Case: Amazon Go (2018–2024)",
+        title: "Frictionless 'Just Walk Out' Autonomous Store",
+        subtitle: "Smart Retail Checkout Infrastructure Pitch",
+        pitchHtml: `“Our <span class="buzzword">autonomous AI store engine</span> eliminates cashiers forever. Powered by <span class="buzzword">self-learning spatial intelligence</span>, our store effortlessly understands shopper intent the moment you grab an item and walk out—zero human intervention required.”`,
+        options: [
+          {
+            label: "Large Language Model (LLM) Reasoning",
+            desc: "A multimodal text-and-vision LLM narrating shopper behavior in real time."
+          },
+          {
+            label: "Computer Vision + Sensor Fusion + Human-in-the-Loop",
+            desc: "Overhead cameras and shelf weight sensors paired with hundreds of remote human reviewers verifying ambiguous trips."
+          },
+          {
+            label: "Pure Blockchain & RFID Smart Tags",
+            desc: "Every grocery item contains an active GPS/RFID microchip scanned at the exit gate."
+          },
+          {
+            label: "Unsupervised Clustering on Credit Card Logs",
+            desc: "Predicting what customers bought based solely on past receipt averages."
+          }
+        ],
+        correctIndex: 1,
+        techCategory: "Computer Vision + Sensor Fusion + Human-in-the-Loop",
+        hypeLevel: "High Hype • Heavy Hidden Labor",
+        hypeBadgeClass: "bg-amber-100 text-amber-900 border border-amber-300",
+        underTheHood: "While Computer Vision (object tracking) and shelf weight sensors did the heavy lifting, investigative reporting revealed that over 1,000 remote contractors in India manually reviewed video feeds to label edge cases and verify receipts when cameras were occluded.",
+        managerTakeaway: "Watch out for 'Fauxtomation' (AI washing). Even advanced Computer Vision struggles with edge cases in messy physical environments, creating massive hidden operational labor costs that can ruin unit economics.",
+        questions: [
+          "What percentage of transactions require human-in-the-loop review or exception handling today?",
+          "What is the total cost of retrofitting ceiling cameras and weight sensors per square foot compared to self-checkout kiosks?"
+        ]
+      },
+      {
+        id: 2,
+        industry: "Consumer Packaged Goods (CPG)",
+        reference: "Real-World Case: Coca-Cola Y3000 (2023)",
+        title: "AI 'Co-Created' Future Beverage Flavor",
+        subtitle: "CPG Product Innovation & Marketing Campaign",
+        pitchHtml: `“Co-created with <span class="buzzword">cutting-edge Artificial Intelligence</span>, this limited-edition beverage captures the exact taste of the year 3000 by <span class="buzzword">synthesizing human emotions</span> and <span class="buzzword">neural flavor chemistry</span> into an unprecedented sensory experience.”`,
+        options: [
+          {
+            label: "Predictive Trend Analytics + GenAI Packaging Art",
+            desc: "ML analyzed consumer flavor-pairing preferences, human food scientists formulated the drink, and GenAI created the futuristic label artwork."
+          },
+          {
+            label: "Autonomous Robotic Chemical Lab",
+            desc: "A self-directed AI robot synthesized brand-new molecular compounds without human food chemists."
+          },
+          {
+            label: "Large Language Model Taste Simulation",
+            desc: "ChatGPT wrote the chemical syrup recipe and sent it directly to automated bottling plants."
+          },
+          {
+            label: "Rule-Based Random Ingredient Generator",
+            desc: "A simple dice-roll script picking 3 random fruit extracts from a database."
+          }
+        ],
+        correctIndex: 0,
+        techCategory: "Predictive Analytics + Generative AI (Marketing)",
+        hypeLevel: "Marketing Halo Effect",
+        hypeBadgeClass: "bg-purple-100 text-purple-900 border border-purple-300",
+        underTheHood: "Food scientists still formulated the actual beverage! Traditional data analytics/ML mined consumer survey associations around 'the future,' while Generative AI (like Stable Diffusion) was used primarily to generate the futuristic packaging art and promotional visuals.",
+        managerTakeaway: "Companies often wrap traditional R&D in an 'AI co-creation' narrative to generate earned media buzz. Managers must distinguish between AI used as a marketing/ideation catalyst versus AI actually automating core R&D.",
+        questions: [
+          "Which specific stage of the product lifecycle used AI—consumer insight mining, molecular formulation, or ad creative?",
+          "Does the AI provide a repeatable R&D speed advantage, or was it a one-off PR campaign?"
+        ]
+      },
+      {
+        id: 3,
+        industry: "Enterprise Productivity SaaS",
+        reference: "Real-World Case: Early 'AI' Scheduling Assistants (e.g., x.ai / Clara)",
+        title: "Autonomous Executive Calendar Assistant",
+        subtitle: "B2B Workflow Automation Pitch",
+        pitchHtml: `“Simply CC 'Amy' on any email thread and let our <span class="buzzword">human-like conversational AI</span> negotiate meeting times, understand subtle social nuances, and <span class="buzzword">autonomously manage</span> your executive calendar 24/7.”`,
+        options: [
+          {
+            label: "Early GPT-4 Transformer Architecture",
+            desc: "A billion-parameter foundation model trained on billions of internet web pages."
+          },
+          {
+            label: "Basic NLP Templates + Secret Human Operators",
+            desc: "Rule-based text parsers backed by gig-economy workers manually reading emails and typing calendar invites behind the scenes."
+          },
+          {
+            label: "Reinforcement Learning Game Tree",
+            desc: "An AlphaGo-style algorithm playing millions of simulated scheduling games."
+          },
+          {
+            label: "Optical Character Recognition (OCR)",
+            desc: "Scanning screenshots of paper day-planners."
+          }
+        ],
+        correctIndex: 1,
+        techCategory: "Rule-Based NLP + Human-in-the-Loop ('Mechanical Turk' AI)",
+        hypeLevel: "Classic AI Washing",
+        hypeBadgeClass: "bg-rose-100 text-rose-900 border border-rose-300",
+        underTheHood: "Before modern LLMs, several prominent 'AI assistant' startups relied heavily on human contractors working long shifts to read messy email threads and verify scheduling rules whenever their brittle NLP scripts failed.",
+        managerTakeaway: "If a vendor's AI seems magically flawless at understanding messy human context—and takes 10–30 minutes to reply—suspect human labor behind the curtain. That creates massive privacy risks (strangers reading executive emails) and poor gross margins.",
+        questions: [
+          "What is the system's average response latency, and do human annotators ever view our raw corporate emails?",
+          "Are we paying software SaaS margins for what is essentially a disguised BPO (Business Process Outsourcing) service?"
+        ]
+      },
+      {
+        id: 4,
+        industry: "Financial Services & Banking",
+        reference: "Real-World Case: Mastercard / JPMorgan Fraud Engines",
+        title: "Millisecond Credit Card Fraud Shield",
+        subtitle: "Enterprise FinTech Risk & Compliance Pitch",
+        pitchHtml: `“Our <span class="buzzword">next-gen cognitive AI brain</span> protects billions of cardholders in real time, <span class="buzzword">deeply understanding</span> global criminal behavior to block fraudulent transactions in under 15 milliseconds.”`,
+        options: [
+          {
+            label: "Large Language Model (LLM) Chat Agent",
+            desc: "Prompting an LLM to write a paragraph explaining whether each swipe looks suspicious."
+          },
+          {
+            label: "Supervised ML & Anomaly Detection (Gradient Boosted Trees / Neural Nets)",
+            desc: "Predictive ML models trained on billions of labeled tabular transactions scoring risk features in milliseconds."
+          },
+          {
+            label: "Generative Image Diffusion",
+            desc: "Turning credit card receipts into synthetic pictures to spot forgery."
+          },
+          {
+            label: "Static Hardcoded Country Blacklists",
+            desc: "Blocking every transaction that occurs outside the cardholder's home zip code."
+          }
+        ],
+        correctIndex: 1,
+        techCategory: "Predictive Machine Learning (Supervised & Anomaly Detection)",
+        hypeLevel: "Legitimate AI • Wrongly Conflated with LLMs",
+        hypeBadgeClass: "bg-emerald-100 text-emerald-900 border border-emerald-300",
+        underTheHood: "This is classic, high-ROI Predictive Machine Learning (such as XGBoost, Random Forests, and specialized neural networks) running on structured tabular features (merchant ID, velocity, geolocation, device fingerprint)—not an LLM.",
+        managerTakeaway: "LLMs take hundreds of milliseconds to seconds and struggle with numerical tabular math. For high-speed, high-volume structured decisions like fraud or credit scoring, traditional Predictive ML is vastly faster, cheaper, and more accurate.",
+        questions: [
+          "How does your model handle 'concept drift' as fraudsters invent new attack patterns?",
+          "Can your system generate regulator-compliant reason codes explaining why a legitimate customer's card was declined?"
+        ]
+      },
+      {
+        id: 5,
+        industry: "Supply Chain & Logistics",
+        reference: "Real-World Case: UPS ORION Routing System",
+        title: "Dynamic Fleet Route Optimization Engine",
+        subtitle: "Enterprise Supply Chain & Sustainability Pitch",
+        pitchHtml: `“Powered by <span class="buzzword">proprietary logistics AI</span>, our platform evaluates trillions of delivery permutations per second to <span class="buzzword">intelligently orchestrate</span> driver routes, saving 100 million miles and 10 million gallons of fuel annually.”`,
+        options: [
+          {
+            label: "Operations Research & Combinatorial Optimization Algorithms",
+            desc: "Advanced mathematical heuristics and graph algorithms solving the Vehicle Routing Problem—zero neural networks or LLMs."
+          },
+          {
+            label: "Generative AI Text-to-Map",
+            desc: "Asking an LLM to write turn-by-turn driving directions from memory."
+          },
+          {
+            label: "Facial Recognition on Delivery Drivers",
+            desc: "Monitoring driver eye movements to guess which street to turn onto next."
+          },
+          {
+            label: "Random Trial-and-Error in Live Traffic",
+            desc: "Sending trucks down random roads until one arrives on time."
+          }
+        ],
+        correctIndex: 0,
+        techCategory: "Operations Research / Combinatorial Optimization",
+        hypeLevel: "Math Rebranded as 'AI'",
+        hypeBadgeClass: "bg-sky-100 text-sky-900 border border-sky-300",
+        underTheHood: "UPS ORION is one of the greatest business analytics triumphs in history—and it is built on Operations Research (mathematical optimization heuristics for the Vehicle Routing Problem), not Machine Learning or Generative AI.",
+        managerTakeaway: "Many of the highest-ROI enterprise technologies aren't ML at all—they are Operations Research and mathematical optimization. Don't pay a 'Generative AI premium' when deterministic optimization solves constraints cleanly and provably.",
+        questions: [
+          "Is this a deterministic mathematical solver or a probabilistic ML model?",
+          "How cleanly does the engine integrate with real-time telematics, weather, and ERP inventory data?"
+        ]
+      },
+      {
+        id: 6,
+        industry: "Consumer Hardware & IoT",
+        reference: "Real-World Case: 'AI-Powered' Smart Toothbrushes & Appliances",
+        title: "AI-Guided Dental Hygiene Ecosystem",
+        subtitle: "Connected Consumer Device Pitch",
+        pitchHtml: `“Meet the world’s first <span class="buzzword">AI-powered smart toothbrush</span>. Using <span class="buzzword">intelligent neural coaching</span>, it analyzes your brushing style in real time to guarantee a dentist-grade clean across every quadrant of your mouth.”`,
+        options: [
+          {
+            label: "On-Device Large Language Model",
+            desc: "A 7-billion-parameter language model running inside the toothbrush handle."
+          },
+          {
+            label: "Basic Accelerometer + Rule-Based Thresholds",
+            desc: "A cheap motion/pressure sensor paired with simple if/else timers (e.g., 'if time < 30s per quadrant, blink LED')."
+          },
+          {
+            label: "Miniature LiDAR & Dental X-Ray",
+            desc: "Laser-scanning tooth enamel and diagnosing cavities autonomously."
+          },
+          {
+            label: "Cloud Reinforcement Learning",
+            desc: "Streaming live video from inside your mouth to AWS GPU clusters."
+          }
+        ],
+        correctIndex: 1,
+        techCategory: "Basic IoT Sensors + Deterministic Rule-Based Logic",
+        hypeLevel: "Pure Buzzword Marketing",
+        hypeBadgeClass: "bg-rose-100 text-rose-900 border border-rose-300",
+        underTheHood: "Inside most 'AI' appliances (toothbrushes, washing machines, toasters) is a standard microcontroller reading a $0.50 accelerometer, temperature, or pressure sensor with hardcoded if/then logic.",
+        managerTakeaway: "Adding 'AI' to consumer hardware is often a pricing strategy to justify a $200 price tag on a $40 device. As a manager, ask whether machine learning actually improves customer outcomes—or if simple sensor rules already do the job.",
+        questions: [
+          "Does the device actually learn and adapt its weights over time from user data, or are the rules fixed in firmware?",
+          "What happens to core product functionality if the companion cloud app is discontinued?"
+        ]
+      },
+      {
+        id: 7,
+        industry: "Digital Media & Streaming",
+        reference: "Real-World Case: Netflix & Spotify Recommendation Engines",
+        title: "Hyper-Personalized Content Discovery Engine",
+        subtitle: "Media & E-Commerce Retention Platform Pitch",
+        pitchHtml: `“Our <span class="buzzword">AI curation engine</span> knows what you want to watch before you do—driving over 80% of platform engagement through <span class="buzzword">deep neural personalization</span> tailored uniquely to every subscriber.”`,
+        options: [
+          {
+            label: "Collaborative Filtering & Deep Predictive ML",
+            desc: "Matrix factorization and deep learning models predicting click/watch probability from user behavior vectors—not generating new movies."
+          },
+          {
+            label: "Generative AI Video Synthesis",
+            desc: "Generating brand-new, custom-filmed TV episodes on the fly for each viewer."
+          },
+          {
+            label: "Manual Human Editors Curating Every User's Homepage",
+            desc: "Thousands of staff members hand-picking rows for 250 million accounts."
+          },
+          {
+            label: "Alphabetical Sorting by Release Date",
+            desc: "Showing every user the exact same chronological list."
+          }
+        ],
+        correctIndex: 0,
+        techCategory: "Predictive ML (Collaborative Filtering & Deep Learning)",
+        hypeLevel: "Core Production AI • Pre-GenAI",
+        hypeBadgeClass: "bg-emerald-100 text-emerald-900 border border-emerald-300",
+        underTheHood: "Recommendation systems rely on Collaborative Filtering ('users who liked X also liked Y'), Matrix Factorization, and Deep Neural Networks trained on implicit feedback (clicks, watch duration, skips). They rank existing items; they don't generate new ones.",
+        managerTakeaway: "Predictive ML recommendation engines are among the most proven revenue-drivers in digital business, yet they suffer from 'filter bubbles' and cold-start problems when launching new products with zero historical data.",
+        questions: [
+          "How does your recommender solve the 'cold-start problem' for brand-new items or first-time customers?",
+          "What guardrails prevent feedback loops that over-narrow user discovery and hurt long-term retention?"
+        ]
+      },
+      {
+        id: 8,
+        industry: "Enterprise Legal & Knowledge Work",
+        reference: "Real-World Case: Harvey AI / Enterprise RAG Copilots",
+        title: "Enterprise Contract Review & Drafting Copilot",
+        subtitle: "LegalTech & Knowledge Management Pitch",
+        pitchHtml: `“Accelerate contract redlining by 10x with our <span class="buzzword">legal-grade AI copilot</span>. Trained on millions of agreements, it <span class="buzzword">reads, reasons, and drafts</span> bespoke indemnity clauses aligned with your corporate playbook.”`,
+        options: [
+          {
+            label: "Large Language Model (LLM) + Retrieval-Augmented Generation (RAG)",
+            desc: "A foundation LLM grounded on your company's internal contract playbook via vector search to draft and summarize text."
+          },
+          {
+            label: "Exact-Match CTRL+F Keyword Search",
+            desc: "Highlighting the word 'indemnity' in yellow without understanding context."
+          },
+          {
+            label: "Operations Research Linear Programming",
+            desc: "Solving simultaneous algebraic equations to calculate contract length."
+          },
+          {
+            label: "Computer Vision Barcode Scanner",
+            desc: "Reading QR codes printed on the cover page of PDF contracts."
+          }
+        ],
+        correctIndex: 0,
+        techCategory: "Generative AI (Large Language Model + RAG Architecture)",
+        hypeLevel: "True GenAI • High Governance Risk",
+        hypeBadgeClass: "bg-indigo-100 text-indigo-900 border border-indigo-300",
+        underTheHood: "This is a genuine LLM use case! Using Retrieval-Augmented Generation (RAG), the system retrieves relevant clauses from your corporate playbook and feeds them into an LLM to draft redlines and plain-English summaries.",
+        managerTakeaway: "LLMs excel at unstructured text synthesis, summarization, and drafting—but they are probabilistic next-token predictors, not legal truth engines. Deploying them without citations, human-in-the-loop sign-off, and zero-data-retention guarantees invites hallucination and confidentiality disasters.",
+        questions: [
+          "Does the system provide clickable inline citations back to exact source paragraphs, and how do you measure hallucination rates?",
+          "Is our proprietary contract data contractually isolated from ever being used to train your foundation models?"
+        ]
+      },
+      {
+        id: 9,
+        industry: "Industrial Automation & Fulfillment",
+        reference: "Real-World Case: Amazon Robotics (Kiva) & Warehouse Fleets",
+        title: "Swarm-Intelligence Warehouse Robotics Fleet",
+        subtitle: "Smart Manufacturing & Fulfillment Pitch",
+        pitchHtml: `“Our <span class="buzzword">autonomous robotic workforce</span> uses <span class="buzzword">self-optimizing swarm AI</span> to dynamically coordinate thousands of mobile robots across the warehouse floor, eliminating bottlenecks and tripling pick-and-pack throughput.”`,
+        options: [
+          {
+            label: "Reinforcement Learning + Pathfinding + Computer Vision/LiDAR",
+            desc: "Multi-agent pathfinding algorithms, LiDAR/vision collision avoidance, and RL policies optimizing traffic flow."
+          },
+          {
+            label: "Conversational Chatbot Talking to Warehouse Workers",
+            desc: "Robots that write poetry about cardboard boxes."
+          },
+          {
+            label: "Purely Random Movement Until Shelves Collide",
+            desc: "Bumper-car physics with no central warehouse management system."
+          },
+          {
+            label: "Excel Macros Running on a Laptop",
+            desc: "A VBA spreadsheet manually emailed to each robot every morning."
+          }
+        ],
+        correctIndex: 0,
+        techCategory: "Robotics: Reinforcement Learning + Pathfinding + Vision",
+        hypeLevel: "High CapEx • Operational Complexity",
+        hypeBadgeClass: "bg-emerald-100 text-emerald-900 border border-emerald-300",
+        underTheHood: "Modern warehouse fleets combine centralized multi-agent pathfinding (graph algorithms), Reinforcement Learning for congestion control, and onboard LiDAR/Computer Vision sensors (plus floor fiducial markers) for safe navigation.",
+        managerTakeaway: "Physical AI (Robotics + RL) delivers transformative productivity, but requires massive upfront CapEx, standardized warehouse layouts, and tight integration with legacy Warehouse Management Systems (WMS).",
+        questions: [
+          "What warehouse floor modifications or racking standardization are required before the robots can operate?",
+          "What is the fallback protocol when an exception occurs (e.g., a spilled liquid or fallen box) that sensors cannot classify?"
+        ]
+      },
+      {
+        id: 10,
+        industry: "Human Resources & Talent Acquisition",
+        reference: "Real-World Case: Algorithmic Resume Screeners (e.g., Amazon's scrapped recruiting tool)",
+        title: "Bias-Free 'AI' Talent Acquisition Screener",
+        subtitle: "HR Tech Recruiting Automation Pitch",
+        pitchHtml: `“Screen 50,000 applicants in seconds with our <span class="buzzword">objective AI talent engine</span>. By <span class="buzzword">analyzing deep career signals</span>, we surface your top 1% future leaders while eliminating human subjectivity.”`,
+        options: [
+          {
+            label: "Keyword/TF-IDF Scoring & Supervised ML Trained on Past Hires",
+            desc: "NLP text-scoring and classification models trained on historical resume outcomes—which often encode historical human biases."
+          },
+          {
+            label: "Predictive DNA & Brainwave Scanning",
+            desc: "Sequencing applicant genomes from PDF resumes."
+          },
+          {
+            label: "Reinforcement Learning in a Video Game",
+            desc: "Having every accountant candidate play Fortnite to measure leadership."
+          },
+          {
+            label: "Zero-Data Psychic Prediction",
+            desc: "Ranking candidates without reading their resumes at all."
+          }
+        ],
+        correctIndex: 0,
+        techCategory: "NLP Text Classification / Supervised ML on Historical Data",
+        hypeLevel: "High Ethical, Legal & Bias Risk",
+        hypeBadgeClass: "bg-rose-100 text-rose-900 border border-rose-300",
+        underTheHood: "Most 'AI' resume screeners use NLP keyword extraction (TF-IDF or embeddings) paired with supervised classification models trained on a company's past hiring decisions and performance reviews.",
+        managerTakeaway: "Algorithms trained on historical human decisions don't automatically eliminate bias—they automate and scale it. Amazon famously scrapped an internal recruiting tool after discovering it penalized resumes containing the word 'women's' because historical tech hires were predominantly male.",
+        questions: [
+          "What training data was used to define a 'successful hire,' and has an independent third-party bias audit been conducted?",
+          "How does your tool comply with emerging AI employment laws (such as NYC Local Law 144 and the EU AI Act)?"
+        ]
+      }
+    ];
+
+    // Game State
+    let activeScenarios = [...SCENARIOS];
+    let currentIndex = 0;
+    let score = 0;
+    let streak = 0;
+    let answeredCount = 0;
+    let isAnswered = false;
+    let historyLog = [];
+    let teamMode = false;
+    let teamScores = { A: 0, B: 0, C: 0 };
+
+    // DOM Element References
+    const introScreen = document.getElementById('introScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const summaryScreen = document.getElementById('summaryScreen');
+
+    /**
+     * Fisher-Yates shuffle helper
+     */
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    /**
+     * Toggle Classroom Projector Mode (larger fonts for lecture halls)
+     */
+    function toggleProjectorMode() {
+      document.body.classList.toggle('projector-mode');
+      const isProjector = document.body.classList.contains('projector-mode');
+      const label = document.getElementById('projectorLabel');
+      const btn = document.getElementById('projectorBtn');
+      label.textContent = isProjector ? 'Projector: ON' : 'Projector';
+      if (isProjector) {
+        btn.classList.add('bg-amber-500/20', 'border-amber-400', 'text-amber-200');
+      } else {
+        btn.classList.remove('bg-amber-500/20', 'border-amber-400', 'text-amber-200');
+      }
+    }
+
+    /**
+     * Toggle Classroom Team A / B / C Scoreboard Bar
+     */
+    function toggleTeamMode() {
+      teamMode = !teamMode;
+      const bar = document.getElementById('teamScoreboardBar');
+      const label = document.getElementById('teamModeLabel');
+      const btn = document.getElementById('teamModeBtn');
+
+      if (teamMode) {
+        bar.classList.remove('hidden');
+        label.textContent = 'Teams: ON';
+        btn.classList.add('bg-indigo-600/30', 'border-indigo-400', 'text-white');
+      } else {
+        bar.classList.add('hidden');
+        label.textContent = 'Teams: Off';
+        btn.classList.remove('bg-indigo-600/30', 'border-indigo-400', 'text-white');
+      }
+    }
+
+    /**
+     * Adjust manual team scores during live classroom competition
+     */
+    function adjustTeamScore(team, delta) {
+      teamScores[team] = Math.max(0, teamScores[team] + delta);
+      document.getElementById(`team${team}Score`).textContent = teamScores[team];
+    }
+
+    /**
+     * Update header score & streak display
+     */
+    function updateHeaderStats() {
+      document.getElementById('headerScore').textContent = `${score} / ${answeredCount}`;
+      document.getElementById('headerStreak').textContent = `${streak}🔥`;
+    }
+
+    /**
+     * Start or restart the game
+     */
+    function startGame(shouldShuffle = false) {
+      activeScenarios = shouldShuffle ? shuffleArray(SCENARIOS) : [...SCENARIOS];
+      currentIndex = 0;
+      score = 0;
+      streak = 0;
+      answeredCount = 0;
+      historyLog = [];
+      updateHeaderStats();
+
+      introScreen.classList.add('hidden');
+      summaryScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+
+      renderScenario();
+    }
+
+    /**
+     * Return to the intro briefing screen
+     */
+    function returnToIntro() {
+      gameScreen.classList.add('hidden');
+      summaryScreen.classList.add('hidden');
+      introScreen.classList.remove('hidden');
+    }
+
+    /**
+     * Render the current scenario and shuffle its answer options cleanly
+     */
+    function renderScenario() {
+      isAnswered = false;
+      const item = activeScenarios[currentIndex];
+      const total = activeScenarios.length;
+
+      // Update progress metadata
+      document.getElementById('caseCounterBadge').textContent = `Case ${currentIndex + 1} of ${total}`;
+      document.getElementById('industryTag').textContent = item.industry;
+      const pct = Math.round(((currentIndex + 1) / total) * 100);
+      document.getElementById('progressBar').style.width = `${pct}%`;
+      document.getElementById('progressPercent').textContent = `${pct}%`;
+
+      // Update Vendor Pitch card
+      document.getElementById('realWorldCaseRef').textContent = item.reference;
+      document.getElementById('scenarioTitle').textContent = item.title;
+      document.getElementById('scenarioSubtitle').textContent = item.subtitle;
+      document.getElementById('vendorPitchText').innerHTML = item.pitchHtml;
+
+      // Hide feedback panel & reset hint
+      const feedbackPanel = document.getElementById('feedbackPanel');
+      feedbackPanel.classList.add('hidden');
+      document.getElementById('selectionHint').textContent = 'Select an option to lock in your audit';
+
+      // Build shuffled options while tracking which one is correct
+      const indexedOptions = item.options.map((opt, idx) => ({
+        ...opt,
+        isCorrect: idx === item.correctIndex,
+      }));
+      const shuffledOptions = shuffleArray(indexedOptions);
+
+      const optionsGrid = document.getElementById('optionsGrid');
+      optionsGrid.innerHTML = '';
+      const letters = ['A', 'B', 'C', 'D'];
+
+      shuffledOptions.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.correct = opt.isCorrect ? 'true' : 'false';
+        btn.className =
+          'option-card group text-left p-4 sm:p-5 rounded-2xl bg-white hover:bg-indigo-50/60 border-2 border-slate-200 hover:border-indigo-400 shadow-sm transition-all duration-200 flex items-start gap-3.5 cursor-pointer focus:outline-none focus:ring-4 focus:ring-indigo-500/20';
+
+        btn.innerHTML = `
+          <span class="option-letter w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-indigo-600 group-hover:text-white text-slate-700 font-mono font-bold text-sm flex items-center justify-center shrink-0 transition-colors mt-0.5">
+            ${letters[idx]}
+          </span>
+          <div class="flex-1">
+            <div class="option-title font-bold text-slate-900 text-base leading-snug mb-1">${opt.label}</div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">${opt.desc}</p>
+          </div>
+        `;
+
+        btn.addEventListener('click', () => handleOptionSelect(btn, opt.isCorrect));
+        optionsGrid.appendChild(btn);
+      });
+
+      // Re-trigger subtle entrance animation on pitch card
+      const pitchCard = document.getElementById('pitchCard');
+      pitchCard.classList.remove('animate-fade-up');
+      void pitchCard.offsetWidth;
+      pitchCard.classList.add('animate-fade-up');
+    }
+
+    /**
+     * Handle user answer selection and reveal CIO Due-Diligence Breakdown
+     */
+    function handleOptionSelect(selectedBtn, isCorrect) {
+      if (isAnswered) return;
+      isAnswered = true;
+      answeredCount++;
+
+      const item = activeScenarios[currentIndex];
+      if (isCorrect) {
+        score++;
+        streak++;
+      } else {
+        streak = 0;
+      }
+      updateHeaderStats();
+
+      // Record in history log for final summary
+      historyLog.push({
+        title: item.title,
+        techCategory: item.techCategory,
+        correct: isCorrect,
+      });
+
+      // Style all option cards to reveal truth
+      const allCards = document.querySelectorAll('.option-card');
+      allCards.forEach((card) => {
+        card.disabled = true;
+        card.classList.remove('hover:bg-indigo-50/60', 'hover:border-indigo-400', 'cursor-pointer');
+        card.classList.add('cursor-default');
+
+        const cardIsCorrect = card.dataset.correct === 'true';
+        const letterBadge = card.querySelector('.option-letter');
+
+        if (cardIsCorrect) {
+          card.classList.remove('border-slate-200', 'bg-white');
+          card.classList.add('border-emerald-500', 'bg-emerald-50/80', 'ring-2', 'ring-emerald-500/20');
+          letterBadge.classList.remove('bg-slate-100', 'text-slate-700');
+          letterBadge.classList.add('bg-emerald-600', 'text-white');
+          letterBadge.textContent = '✓';
+        } else if (card === selectedBtn && !isCorrect) {
+          card.classList.remove('border-slate-200', 'bg-white');
+          card.classList.add('border-rose-500', 'bg-rose-50/80');
+          letterBadge.classList.remove('bg-slate-100', 'text-slate-700');
+          letterBadge.classList.add('bg-rose-600', 'text-white');
+          letterBadge.textContent = '✕';
+        } else {
+          card.classList.add('opacity-55');
+        }
+      });
+
+      document.getElementById('selectionHint').textContent = 'Audit Locked • Review CIO Briefing Below';
+
+      // Populate CIO Due-Diligence Breakdown Panel
+      const feedbackPanel = document.getElementById('feedbackPanel');
+      const feedbackHeader = document.getElementById('feedbackHeader');
+      const feedbackIcon = document.getElementById('feedbackIcon');
+      const feedbackVerdictTitle = document.getElementById('feedbackVerdictTitle');
+      const feedbackTechTag = document.getElementById('feedbackTechTag');
+      const hypeMeterBadge = document.getElementById('hypeMeterBadge');
+
+      if (isCorrect) {
+        feedbackPanel.className = 'animate-fade-up rounded-3xl overflow-hidden shadow-xl border-2 border-emerald-500';
+        feedbackHeader.className = 'px-6 py-4 flex flex-wrap items-center justify-between gap-3 bg-emerald-600 text-white';
+        feedbackIcon.className = 'w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-xl shrink-0 bg-white text-emerald-700';
+        feedbackIcon.textContent = '✓';
+        feedbackVerdictTitle.textContent = 'Spot On! You Saw Through the Hype.';
+      } else {
+        feedbackPanel.className = 'animate-fade-up rounded-3xl overflow-hidden shadow-xl border-2 border-rose-500';
+        feedbackHeader.className = 'px-6 py-4 flex flex-wrap items-center justify-between gap-3 bg-rose-600 text-white';
+        feedbackIcon.className = 'w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-xl shrink-0 bg-white text-rose-700';
+        feedbackIcon.textContent = '!';
+        feedbackVerdictTitle.textContent = 'Caught by Vendor Hype! Here Is the Reality:';
+      }
+
+      feedbackTechTag.textContent = `Actual Tech: ${item.techCategory}`;
+      hypeMeterBadge.textContent = item.hypeLevel;
+      hypeMeterBadge.className = `px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm ${item.hypeBadgeClass}`;
+
+      document.getElementById('underTheHoodText').textContent = item.underTheHood;
+      document.getElementById('managerTakeawayText').textContent = item.managerTakeaway;
+
+      const questionsList = document.getElementById('vendorQuestionsList');
+      questionsList.innerHTML = '';
+      item.questions.forEach((q) => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start gap-2.5';
+        li.innerHTML = `
+          <span class="text-indigo-400 font-bold mt-0.5">→</span>
+          <span>“${q}”</span>
+        `;
+        questionsList.appendChild(li);
+      });
+
+      // Update Next button label on final question
+      const nextBtnText = document.getElementById('nextCaseBtnText');
+      nextBtnText.textContent =
+        currentIndex === activeScenarios.length - 1 ? 'View Final CIO Briefing' : 'Next Vendor Pitch';
+
+      feedbackPanel.classList.remove('hidden');
+
+      // Smoothly scroll breakdown into view on smaller viewports
+      setTimeout(() => {
+        feedbackPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+
+    /**
+     * Advance to next scenario or show final executive summary
+     */
+    function nextScenario() {
+      if (currentIndex < activeScenarios.length - 1) {
+        currentIndex++;
+        renderScenario();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        showSummaryScreen();
+      }
+    }
+
+    /**
+     * Render End-of-Game CIO Summary & Discussion Guide
+     */
+    function showSummaryScreen() {
+      gameScreen.classList.add('hidden');
+      summaryScreen.classList.remove('hidden');
+
+      const total = activeScenarios.length;
+      const pct = Math.round((score / total) * 100);
+
+      document.getElementById('finalScoreDisplay').textContent = `${score} / ${total}`;
+      document.getElementById('finalPercentDisplay').textContent = `${pct}% Hype-Proof`;
+
+      let rankTitle = 'Junior Tech Analyst — Watch Out for Buzzwords!';
+      if (pct >= 90) {
+        rankTitle = 'Chief Information Officer (CIO) — Master Hype Detector';
+      } else if (pct >= 70) {
+        rankTitle = 'VP of Technology Strategy — Sharp Due-Diligence Eye';
+      } else if (pct >= 50) {
+        rankTitle = 'IT Procurement Manager — Solid Instincts, Keep Digging';
+      }
+      document.getElementById('rankSubtitle').textContent = rankTitle;
+
+      const reviewGrid = document.getElementById('caseReviewGrid');
+      reviewGrid.innerHTML = '';
+
+      historyLog.forEach((entry, i) => {
+        const div = document.createElement('div');
+        div.className = `p-3.5 rounded-2xl border flex items-start gap-3 ${
+          entry.correct
+            ? 'bg-emerald-50/60 border-emerald-200'
+            : 'bg-rose-50/60 border-rose-200'
+        }`;
+        div.innerHTML = `
+          <span class="w-6 h-6 rounded-lg font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
+            entry.correct ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+          }">
+            ${entry.correct ? '✓' : '✕'}
+          </span>
+          <div>
+            <div class="font-bold text-slate-900 text-sm">${i + 1}. ${entry.title}</div>
+            <div class="text-xs font-mono text-slate-600 mt-0.5">${entry.techCategory}</div>
+          </div>
+        `;
+        reviewGrid.appendChild(div);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
