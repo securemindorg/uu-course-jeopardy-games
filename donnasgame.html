@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACC 201 Equity Challenge — Utica University Group Game</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: rgba(255, 255, 255, 0.96);
+      --surface-soft: #f5f8fc;
+      --uu-blue: #003b71;
+      --uu-blue-dark: #002549;
+      --uu-orange: #e8681f;
+      --uu-orange-dark: #c75311;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
+      --ok-bg: #ecfdf5;
+      --ok-border: #10b981;
+      --ok-text: #065f46;
+      --warn-bg: #fffbeb;
+      --warn-border: #f59e0b;
+      --warn-text: #92400e;
+      --err-bg: #fef2f2;
+      --err-border: #ef4444;
+      --err-text: #991b1b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 8% 12%, rgba(0, 59, 113, 0.085) 0%, rgba(0, 59, 113, 0) 42%),
+        radial-gradient(circle at 92% 18%, rgba(232, 104, 31, 0.085) 0%, rgba(232, 104, 31, 0) 40%),
+        radial-gradient(circle at 82% 88%, rgba(0, 59, 113, 0.075) 0%, rgba(0, 59, 113, 0) 45%),
+        linear-gradient(180deg, #ffffff 0%, #f8fbff 55%, #fffaf6 100%);
+    }
+
+    /* Subtle animated accounting icon backdrop */
+    .bg-accounting-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .acct-float {
+      position: absolute;
+      opacity: 0.075;
+      color: var(--uu-blue);
+      animation: driftSlow 18s ease-in-out infinite;
+    }
+
+    .acct-float.orange {
+      color: var(--uu-orange);
+      animation-duration: 22s;
+      animation-direction: reverse;
+    }
+
+    .acct-float.f1 { top: 8%; left: 4%; width: 74px; animation-delay: 0s; }
+    .acct-float.f2 { top: 22%; right: 5%; width: 84px; animation-delay: -4s; }
+    .acct-float.f3 { top: 52%; left: 3%; width: 68px; animation-delay: -8s; }
+    .acct-float.f4 { top: 68%; right: 4%; width: 78px; animation-delay: -11s; }
+    .acct-float.f5 { bottom: 6%; left: 14%; width: 72px; animation-delay: -6s; }
+    .acct-float.f6 { bottom: 10%; right: 18%; width: 66px; animation-delay: -14s; }
+
+    @keyframes driftSlow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(3deg); }
+    }
+
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseSoft {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(232, 104, 31, 0.25); }
+      50% { box-shadow: 0 0 0 6px rgba(232, 104, 31, 0); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 20px 16px 52px;
+    }
+
+    header.topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(125deg, var(--uu-blue-dark) 0%, var(--uu-blue) 75%, #0a4e8c 100%);
+      color: #ffffff;
+      border: 3px solid var(--uu-orange);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 22px rgba(0, 59, 113, 0.14);
+    }
+
+    .brand .course-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--uu-orange);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: 0.7px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 4px;
+      animation: pulseSoft 3.5s infinite;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 0.85rem;
+      color: #dbeafe;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      background: rgba(0, 25, 54, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .pill span.val { color: #ffb380; }
+
+    .progress-wrap {
+      background: var(--surface-soft);
+      border: 2px solid var(--uu-blue);
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      box-shadow: inset 0 1px 3px rgba(0, 59, 113, 0.12);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--uu-blue), var(--uu-orange));
+      transition: width 0.35s ease;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 2px solid var(--uu-blue);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(0, 59, 113, 0.08);
+      animation: cardEnter 0.28s ease;
+    }
+
+    .badge-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--uu-orange-dark);
+      background: #fff3eb;
+      border: 1px solid var(--uu-orange);
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+      color: var(--uu-blue);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3 {
+      margin: 12px 0 6px;
+      font-size: 1rem;
+      color: var(--uu-blue);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-inline {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .icon-lg {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      stroke: var(--uu-orange);
+      fill: none;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .muted { color: var(--muted); font-size: 0.92rem; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 14px;
+    }
+
+    .level-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .level-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border: 2px solid var(--border);
+      border-top: 5px solid var(--uu-blue);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.16s ease, transform 0.15s ease, box-shadow 0.16s ease;
+    }
+
+    .level-card:hover {
+      border-color: var(--uu-orange);
+      border-top-color: var(--uu-orange);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 59, 113, 0.12);
+    }
+
+    .level-meta {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--uu-orange-dark);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .level-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--uu-blue);
+      margin: 0 0 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-top: 6px;
+    }
+
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      color: var(--uu-blue);
+      background: var(--surface-soft);
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .je-builder {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .je-row {
+      display: grid;
+      grid-template-columns: 115px 1fr 150px 44px;
+      gap: 8px;
+      align-items: center;
+      background: var(--surface-soft);
+      padding: 8px;
+      border-radius: 10px;
+      border: 1.5px solid var(--uu-blue);
+      animation: cardEnter 0.2s ease;
+    }
+
+    @media (max-width: 640px) {
+      .je-row { grid-template-columns: 1fr 1fr; }
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      background: #ffffff;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--uu-orange);
+      box-shadow: 0 0 0 3px rgba(232, 104, 31, 0.14);
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.08s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--uu-orange);
+      color: #ffffff;
+      border: 2px solid var(--uu-orange-dark);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--uu-orange-dark);
+    }
+
+    .btn-blue {
+      background: var(--uu-blue);
+      color: #ffffff;
+      border: 2px solid var(--uu-blue-dark);
+    }
+
+    .btn-blue:hover:not(:disabled) {
+      background: var(--uu-blue-dark);
+    }
+
+    .btn-secondary {
+      background: var(--surface-soft);
+      color: var(--uu-blue);
+      border: 1.5px solid var(--uu-blue);
+    }
+
+    .btn-hint {
+      background: #fffbeb;
+      color: #92400e;
+      border: 1.5px solid #f59e0b;
+    }
+
+    .btn-danger {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1.5px solid #ef4444;
+      padding: 6px 10px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+      align-items: center;
+    }
+
+    .feedback {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      display: none;
+      animation: cardEnter 0.2s ease;
+    }
+
+    .feedback.show { display: block; }
+    .feedback.ok { background: var(--ok-bg); border: 1.5px solid var(--ok-border); color: var(--ok-text); }
+    .feedback.warn { background: var(--warn-bg); border: 1.5px solid var(--warn-border); color: var(--warn-text); }
+    .feedback.err { background: var(--err-bg); border: 1.5px solid var(--err-border); color: var(--err-text); }
+
+    .stmt-box {
+      background: linear-gradient(180deg, #ffffff 0%, var(--surface-soft) 100%);
+      border: 1.5px solid var(--uu-blue);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .stmt-line {
+      display: grid;
+      grid-template-columns: 1fr 190px;
+      gap: 10px;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .stmt-line:last-child { border-bottom: none; }
+
+    .total-row {
+      font-weight: 800;
+      color: var(--uu-blue);
+      border-top: 2px solid var(--uu-blue) !important;
+      padding-top: 10px !important;
+      margin-top: 4px;
+    }
+
+    /* Award Certificate Styling */
+    .certificate {
+      background: radial-gradient(circle at top right, rgba(232, 104, 31, 0.06), transparent 45%),
+                  radial-gradient(circle at bottom left, rgba(0, 59, 113, 0.06), transparent 45%),
+                  #ffffff;
+      border: 6px double var(--uu-blue);
+      outline: 3px solid var(--uu-orange);
+      outline-offset: -12px;
+      border-radius: 16px;
+      padding: 32px 26px;
+      text-align: center;
+      position: relative;
+      animation: cardEnter 0.35s ease;
+    }
+
+    .cert-seal {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 8px;
+      border-radius: 999px;
+      background: #fff3eb;
+      border: 2.5px solid var(--uu-orange);
+      color: var(--uu-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulseSoft 3s infinite;
+    }
+
+    .cert-org {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--uu-orange-dark);
+    }
+
+    .cert-title {
+      font-size: 1.9rem;
+      font-weight: 900;
+      color: var(--uu-blue);
+      margin: 6px 0 4px;
+    }
+
+    .cert-group {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--uu-orange-dark);
+      border-bottom: 2px solid var(--uu-blue);
+      display: inline-block;
+      padding: 4px 24px;
+      margin: 10px 0;
+    }
+
+    .cert-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .cert-metric-box {
+      background: var(--surface-soft);
+      border: 1.5px solid var(--uu-blue);
+      border-top: 3px solid var(--uu-orange);
+      border-radius: 10px;
+      padding: 10px 16px;
+      min-width: 145px;
+    }
+
+    .cert-metric-box .lbl {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .cert-metric-box .val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--uu-blue);
+    }
+
+    @media print {
+      header.topbar, .progress-wrap, .actions, .no-print, .bg-accounting-layer { display: none !important; }
+      body { background: #ffffff; }
+      .card { border: none; box-shadow: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Decorative Accounting Background Icons -->
+  <div class="bg-accounting-layer" aria-hidden="true">
+    <!-- Ledger / Book -->
+    <svg class="acct-float f1" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2">
+      <rect x="12" y="8" width="40" height="48" rx="4" />
+      <line x1="22" y1="8" x2="22" y2="56" />
+      <line x1="28" y1="20" x2="44" y2="20" />
+      <line x1="28" y1="30" x2="44" y2="30" />
+      <line x1="28" y1="40" x2="40" y2="40" />
+    </svg>
+    <!-- Balance Scale -->
+    <svg class="acct-float orange f2" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="32" y1="10" x2="32" y2="54" />
+      <line x1="18" y1="54" x2="46" y2="54" />
+      <line x1="14" y1="20" x2="50" y2="20" />
+      <path d="M14 20 L8 34 H20 Z" />
+      <path d="M50 20 L44 34 H56 Z" />
+    </svg>
+    <!-- Calculator -->
+    <svg class="acct-float f3" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2">
+      <rect x="16" y="8" width="32" height="48" rx="4" />
+      <rect x="22" y="14" width="20" height="10" rx="2" />
+      <circle cx="24" cy="33" r="2" fill="currentColor" />
+      <circle cx="32" cy="33" r="2" fill="currentColor" />
+      <circle cx="40" cy="33" r="2" fill="currentColor" />
+      <circle cx="24" cy="43" r="2" fill="currentColor" />
+      <circle cx="32" cy="43" r="2" fill="currentColor" />
+      <circle cx="40" cy="43" r="2" fill="currentColor" />
+    </svg>
+    <!-- Growth Chart -->
+    <svg class="acct-float orange f4" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2">
+      <polyline points="10,48 24,34 34,42 52,18" />
+      <polyline points="42,18 52,18 52,28" />
+      <line x1="10" y1="54" x2="54" y2="54" />
+    </svg>
+    <!-- Coins / Equity -->
+    <svg class="acct-float f5" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2">
+      <ellipse cx="26" cy="42" rx="12" ry="6" />
+      <path d="M14 42 V50 C14 53.3 19.4 56 26 56 C32.6 56 38 53.3 38 50 V42" />
+      <ellipse cx="42" cy="24" rx="10" ry="5" />
+      <path d="M32 24 V34 C32 36.8 36.5 39 42 39 C47.5 39 52 36.8 52 34 V24" />
+    </svg>
+    <!-- Percent / Audit -->
+    <svg class="acct-float orange f6" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2">
+      <circle cx="32" cy="32" r="22" />
+      <line x1="22" y1="42" x2="42" y2="22" />
+      <circle cx="24" cy="24" r="3" />
+      <circle cx="40" cy="40" r="3" />
+    </svg>
+  </div>
+
+  <div class="container">
+    <header class="topbar">
+      <div class="brand">
+        <span class="course-tag">
+          <svg class="icon-inline" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          ACC 201 • UTICA UNIVERSITY
+        </span>
+        <h1>
+          <svg class="icon-lg" viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M5 7h14"/><path d="M7 7l-3 7h6z"/><path d="M17 7l-3 7h6z"/><path d="M8 21h8"/></svg>
+          Stockholders' Equity Group Challenge
+        </h1>
+        <p>Interactive Accounting Scenarios • Journal Entries, Retained Earnings &amp; Equity</p>
+      </div>
+      <div class="stats">
+        <div class="pill">Group: <span class="val" id="stat-team">Not Set</span></div>
+        <div class="pill">Level: <span class="val" id="stat-level">Home</span></div>
+        <div class="pill">Score: <span class="val" id="stat-score">0</span></div>
+        <div class="pill">Progress: <span class="val" id="stat-prog">0 / 0</span></div>
+      </div>
+    </header>
+
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <section class="card" id="app-container"></section>
+  </div>
+
+  <script>
+    const ICONS = {
+      ledger: `<svg class="icon-inline" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>`,
+      calc: `<svg class="icon-lg" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="12" y1="10" x2="14" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="12" y1="14" x2="14" y2="14"/><line x1="16" y1="14" x2="16" y2="18"/><line x1="8" y1="18" x2="14" y2="18"/></svg>`,
+      chart: `<svg class="icon-lg" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
+      check: `<svg class="icon-inline" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`,
+      bulb: `<svg class="icon-inline" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>`,
+      plus: `<svg class="icon-inline" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+      award: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`
+    };
+
+    const ACCOUNTS = [
+      "Cash",
+      "Organization Expenses",
+      "Dividends Payable",
+      "Common Stock Dividend Distributable",
+      "Common Stock, $1 Par Value",
+      "Common Stock, $1 Stated Value",
+      "Common Stock, No-Par Value",
+      "Common Stock, $10 Par Value",
+      "Common Stock, $25 Par Value",
+      "Preferred Stock, $100 Par Value",
+      "Preferred Stock, $20 Par Value",
+      "Paid-In Capital in Excess of Par, Common Stock",
+      "Paid-In Capital in Excess of Stated Value, Common Stock",
+      "Paid-In Capital in Excess of Par, Preferred Stock",
+      "Paid-In Capital, Treasury Stock",
+      "Treasury Stock",
+      "Retained Earnings",
+      "Income Summary"
+    ];
+
+    const SCENARIOS = [
+      {
+        id: "prob-1",
+        levelNum: 1,
+        difficulty: "Level 1 • Foundational",
+        title: "Stock Issuances & Promoters",
+        summary: "Record 4 stock issuance transactions: par common, stated-value no-par, no-par without stated value, and par preferred stock.",
+        baseline: null,
+        steps: [
+          {
+            type: "je",
+            badge: "Entry 1 of 4",
+            title: "Common Stock Issued for Cash",
+            prompt: "A corporation issued 5,000 shares of $1 par value common stock for $25,000 cash.",
+            hint: "Cash increases by $25,000; Common Stock ($1 par) = 5,000 × $1 = $5,000; remaining $20,000 goes to Paid-In Capital in Excess of Par, Common Stock.",
+            entries: [
+              { side: "Debit", account: "Cash", amount: 25000 },
+              { side: "Credit", account: "Common Stock, $1 Par Value", amount: 5000 },
+              { side: "Credit", account: "Paid-In Capital in Excess of Par, Common Stock", amount: 20000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 2 of 4",
+            title: "No-Par Stock with Stated Value to Promoters",
+            prompt: "A corporation issued 1,000 shares of no-par common stock to its promoters in exchange for their work worth $32,000. The stock has a $1 per share stated value.",
+            hint: "Debit Organization Expenses for $32,000; credit Common Stock, $1 Stated Value for $1,000 (1,000 × $1); credit Paid-In Capital in Excess of Stated Value, Common Stock for $31,000.",
+            entries: [
+              { side: "Debit", account: "Organization Expenses", amount: 32000 },
+              { side: "Credit", account: "Common Stock, $1 Stated Value", amount: 1000 },
+              { side: "Credit", account: "Paid-In Capital in Excess of Stated Value, Common Stock", amount: 31000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 3 of 4",
+            title: "No-Par Stock (No Stated Value) to Promoters",
+            prompt: "A corporation issued 1,000 shares of no-par common stock to its promoters in exchange for their work worth $32,000. The stock has no stated value.",
+            hint: "With no par value and no stated value, the full $32,000 is credited to Common Stock, No-Par Value.",
+            entries: [
+              { side: "Debit", account: "Organization Expenses", amount: 32000 },
+              { side: "Credit", account: "Common Stock, No-Par Value", amount: 32000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 4 of 4",
+            title: "Preferred Stock Issued for Cash",
+            prompt: "A corporation issued 500 shares of $100 par value preferred stock for $200,000.",
+            hint: "Preferred Stock ($100 par) = 500 × $100 = $50,000; excess over par = $200,000 − $50,000 = $150,000.",
+            entries: [
+              { side: "Debit", account: "Cash", amount: 200000 },
+              { side: "Credit", account: "Preferred Stock, $100 Par Value", amount: 50000 },
+              { side: "Credit", account: "Paid-In Capital in Excess of Par, Preferred Stock", amount: 150000 }
+            ]
+          }
+        ]
+      },
+      {
+        id: "prob-2",
+        levelNum: 2,
+        difficulty: "Level 2 • Statement Focus",
+        title: "MKE Company — Statement of Retained Earnings",
+        summary: "Prepare a statement of retained earnings for MKE Company using beginning retained earnings, net income, and cash dividends.",
+        baseline: [
+          ["Retained earnings, Dec. 31 (prior year)", "$250,000"],
+          ["Net income (current year)", "$86,000"],
+          ["Cash dividends declared & paid (current year)", "$32,000"]
+        ],
+        steps: [
+          {
+            type: "re_simple",
+            badge: "Statement of Retained Earnings",
+            title: "MKE Company — Year Ended December 31",
+            prompt: "Calculate net income, cash dividends, and ending retained earnings for MKE Company.",
+            hint: "Ending RE = Beginning RE ($250,000) + Net Income ($86,000) − Cash Dividends ($32,000) = $304,000.",
+            begRE: 250000,
+            expected: { ni: 86000, div: 32000, endRE: 304000 }
+          }
+        ]
+      },
+      {
+        id: "prob-3",
+        levelNum: 3,
+        difficulty: "Level 3 • First-Year Equity",
+        title: "Haggler Corporation — Year-End Equity",
+        summary: "Build Haggler Corporation's December 31 stockholders' equity section after common/preferred issuances, treasury stock, net income, and dividends.",
+        baseline: [
+          ["Common stock ($1 par, 50,000 auth.)", "10,000 issued @ $15"],
+          ["Preferred stock (10%, $20 par, 5,000 auth.)", "1,000 issued @ $100"],
+          ["Treasury stock (common)", "250 shares @ $20"],
+          ["Net income / Cash dividends", "$75,000 / $45,000"]
+        ],
+        steps: [
+          {
+            type: "eq_custom",
+            badge: "Stockholders' Equity Section",
+            title: "Haggler Corporation — As of December 31",
+            prompt: "Enter each component of Haggler Corporation's stockholders' equity section.",
+            hint: "Common stock = $10,000; PIC excess common = $140,000; Preferred stock = $20,000; PIC excess preferred = $80,000 (Total PIC = $250,000); RE = $75,000 − $45,000 = $30,000; Treasury stock = $5,000; Total Equity = $275,000.",
+            fields: [
+              { key: "cs", label: "Common stock — $1 par value (50,000 auth., 10,000 issued)", expected: 10000 },
+              { key: "picC", label: "Paid-in capital in excess of par, common stock", expected: 140000 },
+              { key: "ps", label: "Preferred stock — 10%, $20 par value (5,000 auth., 1,000 issued)", expected: 20000 },
+              { key: "picP", label: "Paid-in capital in excess of par, preferred stock", expected: 80000 },
+              { key: "re", label: "Retained earnings", expected: 30000 },
+              { key: "ts", label: "Less: Treasury stock (enter positive amount subtracted)", expected: 5000 },
+              { key: "tot", label: "Total stockholders' equity", expected: 275000 }
+            ]
+          }
+        ]
+      },
+      {
+        id: "prob-4",
+        levelNum: 4,
+        difficulty: "Level 4 • Stock Dividends",
+        title: "TVX Company — 20% Stock Dividend",
+        summary: "Record declaration and distribution of a 20% stock dividend and prepare the updated stockholders' equity section.",
+        baseline: [
+          ["Common stock ($10 par, 150,000 auth.)", "$600,000 (60,000 sh.)"],
+          ["Paid-in capital in excess of par", "$425,000"],
+          ["Retained earnings (Feb. 4)", "$550,000"],
+          ["Feb. 5 stock market price", "$40 / share"]
+        ],
+        steps: [
+          {
+            type: "je",
+            badge: "Entry 1 of 2 • Feb. 5",
+            title: "Declaration of 20% Stock Dividend",
+            prompt: "On February 5, directors declare a 20% stock dividend distributable on February 28 to February 15 stockholders of record. Market value is $40/share.",
+            hint: "Dividend shares = 60,000 × 20% = 12,000 shares. At $40 market value, Retained Earnings decreases by $480,000; Distributable = 12,000 × $10 = $120,000; PIC excess = $360,000.",
+            entries: [
+              { side: "Debit", account: "Retained Earnings", amount: 480000 },
+              { side: "Credit", account: "Common Stock Dividend Distributable", amount: 120000 },
+              { side: "Credit", account: "Paid-In Capital in Excess of Par, Common Stock", amount: 360000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 2 of 2 • Feb. 28",
+            title: "Distribution of Stock Dividend",
+            prompt: "Distribute the stock dividend declared on February 5.",
+            hint: "Debit Common Stock Dividend Distributable for $120,000 and credit Common Stock, $10 Par Value for $120,000.",
+            entries: [
+              { side: "Debit", account: "Common Stock Dividend Distributable", amount: 120000 },
+              { side: "Credit", account: "Common Stock, $10 Par Value", amount: 120000 }
+            ]
+          },
+          {
+            type: "eq_custom",
+            badge: "Stockholders' Equity After Distribution",
+            title: "TVX Company — Post-Dividend Equity",
+            prompt: "Prepare the stockholders' equity section after the stock dividend is distributed.",
+            hint: "Common stock rises to $720,000 (72,000 shares); PIC excess rises to $785,000; RE drops to $70,000; Total equity stays $1,575,000.",
+            fields: [
+              { key: "cs10", label: "Common stock — $10 par value (150,000 auth., 72,000 issued)", expected: 720000 },
+              { key: "pic", label: "Paid-in capital in excess of par value, common stock", expected: 785000 },
+              { key: "re", label: "Retained earnings", expected: 70000 },
+              { key: "tot", label: "Total stockholders' equity", expected: 1575000 }
+            ]
+          }
+        ]
+      },
+      {
+        id: "prob-5",
+        levelNum: 5,
+        difficulty: "Level 5 • Full Cycle",
+        title: "Alex Corporation — Treasury Stock & Dividends",
+        summary: "Complete 8 transactions, Statement of Retained Earnings, and December 31 Stockholders' Equity for Alex Corporation.",
+        baseline: [
+          ["Common stock ($25 par, 50,000 auth.)", "$750,000 (30,000 sh.)"],
+          ["Paid-in capital in excess of par", "$50,000"],
+          ["Retained earnings (prior year-end)", "$340,000"],
+          ["Total stockholders' equity", "$1,140,000"]
+        ],
+        steps: [
+          {
+            type: "je",
+            badge: "Entry 1 of 8 • Jan. 2",
+            title: "Purchase Treasury Stock",
+            prompt: "Purchased 3,000 shares of its own stock at $25 cash per share.",
+            hint: "3,000 × $25 = $75,000. Debit Treasury Stock and credit Cash.",
+            entries: [
+              { side: "Debit", account: "Treasury Stock", amount: 75000 },
+              { side: "Credit", account: "Cash", amount: 75000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 2 of 8 • Jan. 7",
+            title: "January Cash Dividend Declaration",
+            prompt: "Directors declared a $1.50 per share cash dividend payable on February 28 to February 9 stockholders of record.",
+            hint: "Outstanding shares = 30,000 − 3,000 = 27,000. 27,000 × $1.50 = $40,500.",
+            entries: [
+              { side: "Debit", account: "Retained Earnings", amount: 40500 },
+              { side: "Credit", account: "Dividends Payable", amount: 40500 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 3 of 8 • Feb. 28",
+            title: "Payment of January Dividend",
+            prompt: "Paid the dividend declared on January 7.",
+            hint: "Debit Dividends Payable $40,500 and credit Cash $40,500.",
+            entries: [
+              { side: "Debit", account: "Dividends Payable", amount: 40500 },
+              { side: "Credit", account: "Cash", amount: 40500 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 4 of 8 • July 9",
+            title: "Reissue Treasury Stock Above Cost",
+            prompt: "Sold 1,200 of its treasury shares at $30 cash per share.",
+            hint: "Cash = 1,200 × $30 = $36,000. Cost = 1,200 × $25 = $30,000. Excess = $6,000 -> Paid-In Capital, Treasury Stock.",
+            entries: [
+              { side: "Debit", account: "Cash", amount: 36000 },
+              { side: "Credit", account: "Treasury Stock", amount: 30000 },
+              { side: "Credit", account: "Paid-In Capital, Treasury Stock", amount: 6000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 5 of 8 • Aug. 27",
+            title: "Reissue Treasury Stock Below Cost",
+            prompt: "Sold 1,500 of its treasury shares at $21 cash per share.",
+            hint: "Cash = 1,500 × $21 = $31,500. Cost = 1,500 × $25 = $37,500. Shortfall = $6,000 -> debit Paid-In Capital, Treasury Stock for $6,000.",
+            entries: [
+              { side: "Debit", account: "Cash", amount: 31500 },
+              { side: "Debit", account: "Paid-In Capital, Treasury Stock", amount: 6000 },
+              { side: "Credit", account: "Treasury Stock", amount: 37500 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 6 of 8 • Sept. 9",
+            title: "September Cash Dividend Declaration",
+            prompt: "Directors declared a $2 per share cash dividend payable on October 22 to September 23 stockholders of record.",
+            hint: "Outstanding shares = 30,000 − 300 treasury = 29,700. 29,700 × $2 = $59,400.",
+            entries: [
+              { side: "Debit", account: "Retained Earnings", amount: 59400 },
+              { side: "Credit", account: "Dividends Payable", amount: 59400 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 7 of 8 • Oct. 22",
+            title: "Payment of September Dividend",
+            prompt: "Paid the dividend declared on September 9.",
+            hint: "Debit Dividends Payable $59,400 and credit Cash $59,400.",
+            entries: [
+              { side: "Debit", account: "Dividends Payable", amount: 59400 },
+              { side: "Credit", account: "Cash", amount: 59400 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 8 of 8 • Dec. 31",
+            title: "Close Net Income to Retained Earnings",
+            prompt: "Closed the $52,000 credit balance (from net income) in the Income Summary account to Retained Earnings.",
+            hint: "Debit Income Summary $52,000 and credit Retained Earnings $52,000.",
+            entries: [
+              { side: "Debit", account: "Income Summary", amount: 52000 },
+              { side: "Credit", account: "Retained Earnings", amount: 52000 }
+            ]
+          },
+          {
+            type: "re_simple",
+            badge: "Statement of Retained Earnings",
+            title: "Alex Corporation — Current Year Retained Earnings",
+            prompt: "Complete Alex Corporation's Statement of Retained Earnings.",
+            hint: "Beg RE ($340,000) + Net Income ($52,000) − Dividends ($40,500 + $59,400 = $99,900) = $292,100.",
+            begRE: 340000,
+            expected: { ni: 52000, div: 99900, endRE: 292100 }
+          },
+          {
+            type: "eq_custom",
+            badge: "Stockholders' Equity Section",
+            title: "Alex Corporation — Year-End Balance Sheet",
+            prompt: "Enter Alex Corporation's December 31 stockholders' equity figures.",
+            hint: "Common stock = $750,000; PIC excess = $50,000; PIC treasury = $0; RE = $292,100; Less Treasury stock (300 × $25) = $7,500; Total = $1,084,600.",
+            fields: [
+              { key: "cs25", label: "Common stock — $25 par value (50,000 auth., 30,000 issued)", expected: 750000 },
+              { key: "picC", label: "Paid-in capital in excess of par value, common stock", expected: 50000 },
+              { key: "picT", label: "Paid-in capital, treasury stock", expected: 0 },
+              { key: "re", label: "Retained earnings", expected: 292100 },
+              { key: "ts", label: "Less: Treasury stock (300 shares at $25 cost)", expected: 7500 },
+              { key: "tot", label: "Total stockholders' equity", expected: 1084600 }
+            ]
+          }
+        ]
+      },
+      {
+        id: "balthus-2020",
+        levelNum: 6,
+        difficulty: "Level 6 • Capstone Audit",
+        title: "Balthus Corp. (2020) — Master Equity Case",
+        summary: "Complete all 7 equity entries, Statement of Retained Earnings, and Stockholders' Equity section for Balthus Corp.",
+        baseline: [
+          ["Common stock ($1 par, 320,000 auth.)", "$200,000 (200,000 sh.)"],
+          ["Paid-in capital in excess of par", "$1,400,000"],
+          ["Retained earnings (Dec. 31, 2019)", "$2,160,000"],
+          ["Total stockholders' equity", "$3,760,000"]
+        ],
+        steps: [
+          {
+            type: "je",
+            badge: "Entry 1 of 7 • Jan. 10",
+            title: "Purchase of Treasury Stock",
+            prompt: "Purchased 40,000 shares of its own stock at $12 cash per share.",
+            hint: "40,000 × $12 = $480,000. Debit Treasury Stock and credit Cash.",
+            entries: [
+              { side: "Debit", account: "Treasury Stock", amount: 480000 },
+              { side: "Credit", account: "Cash", amount: 480000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 2 of 7 • Mar. 2",
+            title: "March Cash Dividend Declaration",
+            prompt: "Directors declared a $1.50 per share cash dividend payable on March 31 to March 15 stockholders of record.",
+            hint: "Outstanding shares = 200,000 − 40,000 = 160,000. 160,000 × $1.50 = $240,000.",
+            entries: [
+              { side: "Debit", account: "Retained Earnings", amount: 240000 },
+              { side: "Credit", account: "Dividends Payable", amount: 240000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 3 of 7 • Mar. 31",
+            title: "Payment of March Dividend",
+            prompt: "Paid the dividend declared on March 2.",
+            hint: "Debit Dividends Payable $240,000 and credit Cash $240,000.",
+            entries: [
+              { side: "Debit", account: "Dividends Payable", amount: 240000 },
+              { side: "Credit", account: "Cash", amount: 240000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 4 of 7 • Nov. 11",
+            title: "Reissue Treasury Stock Above Cost",
+            prompt: "Sold 24,000 of its treasury shares at $13 cash per share.",
+            hint: "Cash = 24,000 × $13 = $312,000. Cost = 24,000 × $12 = $288,000. Excess = $24,000 -> Paid-In Capital, Treasury Stock.",
+            entries: [
+              { side: "Debit", account: "Cash", amount: 312000 },
+              { side: "Credit", account: "Treasury Stock", amount: 288000 },
+              { side: "Credit", account: "Paid-In Capital, Treasury Stock", amount: 24000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 5 of 7 • Nov. 25",
+            title: "Reissue Treasury Stock Below Cost",
+            prompt: "Sold 16,000 of its treasury shares at $9.50 cash per share.",
+            hint: "Cash = 16,000 × $9.50 = $152,000. Cost = 16,000 × $12 = $192,000. $40,000 shortfall uses $24,000 PIC Treasury + $16,000 Retained Earnings.",
+            entries: [
+              { side: "Debit", account: "Cash", amount: 152000 },
+              { side: "Debit", account: "Paid-In Capital, Treasury Stock", amount: 24000 },
+              { side: "Debit", account: "Retained Earnings", amount: 16000 },
+              { side: "Credit", account: "Treasury Stock", amount: 192000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 6 of 7 • Dec. 1",
+            title: "December Cash Dividend Declaration",
+            prompt: "Directors declared a $2.50 per share cash dividend payable on January 2 to December 10 stockholders of record.",
+            hint: "Outstanding shares = 200,000 − 0 treasury = 200,000. 200,000 × $2.50 = $500,000.",
+            entries: [
+              { side: "Debit", account: "Retained Earnings", amount: 500000 },
+              { side: "Credit", account: "Dividends Payable", amount: 500000 }
+            ]
+          },
+          {
+            type: "je",
+            badge: "Entry 7 of 7 • Dec. 31",
+            title: "Close Net Income to Retained Earnings",
+            prompt: "Closed the $1,072,000 credit balance (from net income) in the Income Summary account to Retained Earnings.",
+            hint: "Debit Income Summary $1,072,000 and credit Retained Earnings $1,072,000.",
+            entries: [
+              { side: "Debit", account: "Income Summary", amount: 1072000 },
+              { side: "Credit", account: "Retained Earnings", amount: 1072000 }
+            ]
+          },
+          {
+            type: "re_balthus",
+            badge: "Statement of Retained Earnings",
+            title: "Balthus Corp. — Year Ended December 31, 2020",
+            prompt: "Complete Balthus Corp.'s Statement of Retained Earnings (including the Nov. 25 treasury stock adjustment).",
+            hint: "Beg RE ($2,160,000) + Net Income ($1,072,000) − Dividends ($740,000) − Treasury below-cost adjustment ($16,000) = $2,476,000.",
+            begRE: 2160000,
+            expected: { ni: 1072000, div: 740000, tsAdj: 16000, endRE: 2476000 }
+          },
+          {
+            type: "eq_custom",
+            badge: "Stockholders' Equity Section",
+            title: "Balthus Corp. — As of December 31, 2020",
+            prompt: "Enter Balthus Corp.'s December 31, 2020 stockholders' equity components.",
+            hint: "Common stock = $200,000; PIC excess = $1,400,000; PIC treasury = $0; RE = $2,476,000; Less Treasury stock = $0; Total = $4,076,000.",
+            fields: [
+              { key: "cs1", label: "Common stock — $1 par value (320,000 auth., 200,000 issued)", expected: 200000 },
+              { key: "picC", label: "Paid-in capital in excess of par, common stock", expected: 1400000 },
+              { key: "picT", label: "Paid-in capital, treasury stock", expected: 0 },
+              { key: "re", label: "Retained earnings", expected: 2476000 },
+              { key: "ts", label: "Less: Treasury stock (0 shares remaining)", expected: 0 },
+              { key: "tot", label: "Total stockholders' equity", expected: 4076000 }
+            ]
+          }
+        ]
+      }
+    ];
+
+    const state = {
+      screen: "home",
+      teamName: "",
+      selectedScenarioId: SCENARIOS[0].id,
+      stepIndex: 0,
+      score: 0,
+      attempts: 0,
+      correctAttempts: 0,
+      hintsUsed: 0,
+      hintShown: false,
+      rows: [
+        { side: "Debit", account: ACCOUNTS[0], amount: "" },
+        { side: "Credit", account: ACCOUNTS[0], amount: "" }
+      ],
+      formValues: {}
+    };
+
+    function currentScenario() {
+      return SCENARIOS.find(s => s.id === state.selectedScenarioId) || SCENARIOS[0];
+    }
+
+    function parseNum(val) {
+      if (typeof val === "number") return val;
+      const cleaned = String(val || "").replace(/[$,\s]/g, "");
+      if (cleaned === "" || isNaN(Number(cleaned))) return NaN;
+      return Number(cleaned);
+    }
+
+    function fmt(n) {
+      const num = Number(n) || 0;
+      return (num < 0 ? "-" : "") + "$" + Math.abs(num).toLocaleString("en-US");
+    }
+
+    function updateHeader() {
+      const sc = currentScenario();
+      document.getElementById("stat-team").textContent = state.teamName || "Not Set";
+      document.getElementById("stat-score").textContent = state.score;
+
+      if (state.screen === "home") {
+        document.getElementById("stat-level").textContent = "Select Level";
+        document.getElementById("stat-prog").textContent = "0 / 0";
+        document.getElementById("progress-bar").style.width = "0%";
+      } else if (state.screen === "play") {
+        document.getElementById("stat-level").textContent = "Level " + sc.levelNum;
+        document.getElementById("stat-prog").textContent = `${state.stepIndex} / ${sc.steps.length}`;
+        document.getElementById("progress-bar").style.width = `${(state.stepIndex / sc.steps.length) * 100}%`;
+      } else {
+        document.getElementById("stat-level").textContent = "Level " + sc.levelNum;
+        document.getElementById("stat-prog").textContent = `${sc.steps.length} / ${sc.steps.length}`;
+        document.getElementById("progress-bar").style.width = "100%";
+      }
+    }
+
+    function startScenario(scenarioId) {
+      const nameInput = document.getElementById("team-name-input");
+      if (nameInput) {
+        state.teamName = nameInput.value.trim() || "Group 1";
+      } else if (!state.teamName) {
+        state.teamName = "Group 1";
+      }
+      state.selectedScenarioId = scenarioId;
+      state.stepIndex = 0;
+      state.score = 0;
+      state.attempts = 0;
+      state.correctAttempts = 0;
+      state.hintsUsed = 0;
+      state.hintShown = false;
+      state.formValues = {};
+      state.rows = [
+        { side: "Debit", account: ACCOUNTS[0], amount: "" },
+        { side: "Credit", account: ACCOUNTS[0], amount: "" }
+      ];
+      state.screen = "play";
+      render();
+    }
+
+    function render() {
+      updateHeader();
+      const container = document.getElementById("app-container");
+      if (state.screen === "home") renderHome(container);
+      else if (state.screen === "play") renderPlay(container);
+      else renderCertificate(container);
+    }
+
+    function renderHome(container) {
+      const cardsHtml = SCENARIOS.map(sc => `
+        <div class="level-card">
+          <div>
+            <div class="level-meta">${ICONS.ledger} ${sc.difficulty} • ${sc.steps.length} ${sc.steps.length === 1 ? "Task" : "Steps"}</div>
+            <div class="level-title">Level ${sc.levelNum}: ${sc.title}</div>
+            <p class="muted" style="margin:0 0 12px;">${sc.summary}</p>
+          </div>
+          <button class="btn-primary" data-start-id="${sc.id}">Launch Level ${sc.levelNum}</button>
+        </div>
+      `).join("");
+
+      container.innerHTML = `
+        <span class="badge-step">${ICONS.ledger} ACC 201 Home Screen • Choose Your Group Level</span>
+        <h2>${ICONS.calc} Welcome to the Utica University Equity Challenge</h2>
+        <p class="muted">Enter your group name and pick any scenario level below to begin collaborating in class.</p>
+
+        <div class="grid-2" style="margin-top:12px;">
+          <div>
+            <label for="team-name-input" style="display:block;font-weight:700;color:var(--uu-blue);margin-bottom:6px;">
+              Group / Team Name
+            </label>
+            <input id="team-name-input" type="text" placeholder="e.g., Pioneers Ledger Team" value="${state.teamName}" />
+          </div>
+        </div>
+
+        <div class="level-grid">${cardsHtml}</div>
+      `;
+
+      container.querySelectorAll("[data-start-id]").forEach(btn => {
+        btn.onclick = () => startScenario(btn.dataset.startId);
+      });
+    }
+
+    function renderPlay(container) {
+      const sc = currentScenario();
+      const step = sc.steps[state.stepIndex];
+
+      const baselineHtml = sc.baseline ? `
+        <div class="card" style="margin-bottom:16px;padding:14px 18px;">
+          <h3>${ICONS.chart} Scenario Reference Data — Level ${sc.levelNum} (${sc.title})</h3>
+          <table>
+            <thead><tr><th>Reference Item</th><th class="num">Given Data</th></tr></thead>
+            <tbody>
+              ${sc.baseline.map(([k, v]) => `<tr><td>${k}</td><td class="num"><strong>${v}</strong></td></tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      ` : "";
+
+      let bodyHtml = "";
+      if (step.type === "je") {
+        const rowsHtml = state.rows.map((r, idx) => `
+          <div class="je-row">
+            <select data-idx="${idx}" data-field="side">
+              <option value="Debit" ${r.side === "Debit" ? "selected" : ""}>Debit</option>
+              <option value="Credit" ${r.side === "Credit" ? "selected" : ""}>Credit</option>
+            </select>
+            <select data-idx="${idx}" data-field="account">
+              ${ACCOUNTS.map(a => `<option value="${a}" ${r.account === a ? "selected" : ""}>${a}</option>`).join("")}
+            </select>
+            <input type="text" inputmode="numeric" placeholder="Amount" data-idx="${idx}" data-field="amount" value="${r.amount}" />
+            <button class="btn-danger" data-remove="${idx}" ${state.rows.length <= 2 ? "disabled" : ""}>✕</button>
+          </div>
+        `).join("");
+
+        bodyHtml = `
+          <div class="je-builder">${rowsHtml}</div>
+          <div class="actions">
+            <button class="btn-secondary" id="btn-add-line">${ICONS.plus} Add Line</button>
+            <button class="btn-primary" id="btn-check-je">${ICONS.check} Check Journal Entry</button>
+            <button class="btn-hint" id="btn-hint">${ICONS.bulb} ${state.hintShown ? "Hint Shown (-25 pts)" : "Group Hint (-25 pts)"}</button>
+            <button class="btn-blue" id="btn-home">Change Level</button>
+          </div>
+        `;
+      } else if (step.type === "re_simple") {
+        bodyHtml = `
+          <div class="stmt-box">
+            <div class="stmt-line"><span>Beginning retained earnings</span><strong class="num">${fmt(step.begRE)}</strong></div>
+            <div class="stmt-line">
+              <label for="f-ni">Add: Net income</label>
+              <input id="f-ni" type="text" class="num" placeholder="0" value="${state.formValues.ni || ""}" />
+            </div>
+            <div class="stmt-line">
+              <label for="f-div">Less: Cash dividends declared / paid (positive)</label>
+              <input id="f-div" type="text" class="num" placeholder="0" value="${state.formValues.div || ""}" />
+            </div>
+            <div class="stmt-line total-row">
+              <label for="f-end">Ending retained earnings</label>
+              <input id="f-end" type="text" class="num" placeholder="0" value="${state.formValues.endRE || ""}" />
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="btn-check-re-simple">${ICONS.check} Verify Statement</button>
+            <button class="btn-hint" id="btn-hint">${ICONS.bulb} ${state.hintShown ? "Hint Shown (-25 pts)" : "Group Hint (-25 pts)"}</button>
+            <button class="btn-blue" id="btn-home">Change Level</button>
+          </div>
+        `;
+      } else if (step.type === "re_balthus") {
+        bodyHtml = `
+          <div class="stmt-box">
+            <div class="stmt-line"><span>Retained earnings, December 31, 2019</span><strong class="num">$2,160,000</strong></div>
+            <div class="stmt-line">
+              <label for="f-ni">Add: Net income</label>
+              <input id="f-ni" type="text" class="num" placeholder="0" value="${state.formValues.ni || ""}" />
+            </div>
+            <div class="stmt-line">
+              <label for="f-div">Less: Cash dividends declared (positive)</label>
+              <input id="f-div" type="text" class="num" placeholder="0" value="${state.formValues.div || ""}" />
+            </div>
+            <div class="stmt-line">
+              <label for="f-tsadj">Less: Treasury stock reissuance below cost (Nov. 25, positive)</label>
+              <input id="f-tsadj" type="text" class="num" placeholder="0" value="${state.formValues.tsAdj || ""}" />
+            </div>
+            <div class="stmt-line total-row">
+              <label for="f-end">Retained earnings, December 31, 2020</label>
+              <input id="f-end" type="text" class="num" placeholder="0" value="${state.formValues.endRE || ""}" />
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="btn-check-re-balthus">${ICONS.check} Verify Statement</button>
+            <button class="btn-hint" id="btn-hint">${ICONS.bulb} ${state.hintShown ? "Hint Shown (-25 pts)" : "Group Hint (-25 pts)"}</button>
+            <button class="btn-blue" id="btn-home">Change Level</button>
+          </div>
+        `;
+      } else if (step.type === "eq_custom") {
+        const lines = step.fields.map((f, idx) => {
+          const isLast = idx === step.fields.length - 1;
+          return `
+            <div class="stmt-line ${isLast ? "total-row" : ""}">
+              <label for="eq-${f.key}">${f.label}</label>
+              <input id="eq-${f.key}" type="text" class="num" placeholder="0" value="${state.formValues[f.key] || ""}" />
+            </div>
+          `;
+        }).join("");
+
+        bodyHtml = `
+          <div class="stmt-box">${lines}</div>
+          <div class="actions">
+            <button class="btn-primary" id="btn-check-eq">${ICONS.check} Verify Stockholders' Equity</button>
+            <button class="btn-hint" id="btn-hint">${ICONS.bulb} ${state.hintShown ? "Hint Shown (-25 pts)" : "Group Hint (-25 pts)"}</button>
+            <button class="btn-blue" id="btn-home">Change Level</button>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        ${baselineHtml}
+        <span class="badge-step">${ICONS.ledger} Level ${sc.levelNum} • ${step.badge}</span>
+        <h2>${ICONS.calc} ${step.title}</h2>
+        <p style="font-size:1rem;margin:6px 0 12px;"><strong>Prompt:</strong> ${step.prompt}</p>
+        ${bodyHtml}
+        <div class="feedback" id="feedback"></div>
+      `;
+
+      document.getElementById("btn-home").onclick = () => {
+        state.screen = "home";
+        render();
+      };
+
+      const hintBtn = document.getElementById("btn-hint");
+      if (hintBtn) {
+        hintBtn.onclick = () => {
+          if (!state.hintShown) {
+            state.hintShown = true;
+            state.hintsUsed += 1;
+            state.score = Math.max(0, state.score - 25);
+            updateHeader();
+          }
+          const fb = document.getElementById("feedback");
+          fb.className = "feedback warn show";
+          fb.innerHTML = `<strong>Hint:</strong> ${step.hint}`;
+        };
+      }
+
+      if (step.type === "je") {
+        container.querySelectorAll("select, input[data-field='amount']").forEach(el => {
+          const sync = e => {
+            state.rows[Number(e.target.dataset.idx)][e.target.dataset.field] = e.target.value;
+          };
+          el.addEventListener("input", sync);
+          el.addEventListener("change", sync);
+        });
+        container.querySelectorAll("button[data-remove]").forEach(btn => {
+          btn.onclick = () => {
+            const i = Number(btn.dataset.remove);
+            if (state.rows.length > 2) {
+              state.rows.splice(i, 1);
+              render();
+            }
+          };
+        });
+        document.getElementById("btn-add-line").onclick = () => {
+          state.rows.push({ side: "Credit", account: ACCOUNTS[0], amount: "" });
+          render();
+        };
+        document.getElementById("btn-check-je").onclick = () => {
+          const fb = document.getElementById("feedback");
+          const parsed = state.rows.map(r => ({ side: r.side, account: r.account, amount: parseNum(r.amount) }));
+          if (parsed.some(p => isNaN(p.amount) || p.amount <= 0)) {
+            fb.className = "feedback warn show";
+            fb.innerHTML = "Enter a valid positive amount on every line.";
+            return;
+          }
+          const dr = parsed.filter(p => p.side === "Debit").reduce((a, b) => a + b.amount, 0);
+          const cr = parsed.filter(p => p.side === "Credit").reduce((a, b) => a + b.amount, 0);
+          if (dr !== cr) {
+            fb.className = "feedback err show";
+            fb.innerHTML = `Out of balance: Debits = <strong>${fmt(dr)}</strong>, Credits = <strong>${fmt(cr)}</strong>.`;
+            return;
+          }
+          state.attempts += 1;
+          const a = parsed.map(p => `${p.side}|${p.account}|${p.amount}`).sort();
+          const e = step.entries.map(p => `${p.side}|${p.account}|${p.amount}`).sort();
+          const ok = a.length === e.length && a.every((v, i) => v === e[i]);
+          if (ok) {
+            state.correctAttempts += 1;
+            const pts = state.hintShown ? 75 : 100;
+            state.score += pts;
+            fb.className = "feedback ok show";
+            fb.innerHTML = `<strong>Correct! (+${pts} pts)</strong> Advancing...`;
+            advanceStep();
+          } else {
+            fb.className = "feedback err show";
+            fb.innerHTML = "Check your account titles, debit/credit sides, or dollar calculations and try again.";
+            updateHeader();
+          }
+        };
+      } else if (step.type === "re_simple") {
+        ["ni", "div", "endRE"].forEach(k => {
+          const mapId = { ni: "f-ni", div: "f-div", endRE: "f-end" }[k];
+          document.getElementById(mapId).addEventListener("input", e => { state.formValues[k] = e.target.value; });
+        });
+        document.getElementById("btn-check-re-simple").onclick = () => {
+          const fb = document.getElementById("feedback");
+          const ni = parseNum(state.formValues.ni);
+          const div = parseNum(state.formValues.div);
+          const endRE = parseNum(state.formValues.endRE);
+          if ([ni, div, endRE].some(x => isNaN(x))) {
+            fb.className = "feedback warn show";
+            fb.innerHTML = "Please fill in all fields.";
+            return;
+          }
+          state.attempts += 1;
+          if (ni === step.expected.ni && div === step.expected.div && endRE === step.expected.endRE) {
+            state.correctAttempts += 1;
+            const pts = state.hintShown ? 115 : 150;
+            state.score += pts;
+            fb.className = "feedback ok show";
+            fb.innerHTML = `<strong>Statement Verified! (+${pts} pts)</strong>`;
+            advanceStep();
+          } else {
+            fb.className = "feedback err show";
+            fb.innerHTML = "One or more amounts do not match. Check net income, dividends, and ending retained earnings.";
+            updateHeader();
+          }
+        };
+      } else if (step.type === "re_balthus") {
+        ["ni", "div", "tsAdj", "endRE"].forEach(k => {
+          const mapId = { ni: "f-ni", div: "f-div", tsAdj: "f-tsadj", endRE: "f-end" }[k];
+          document.getElementById(mapId).addEventListener("input", e => { state.formValues[k] = e.target.value; });
+        });
+        document.getElementById("btn-check-re-balthus").onclick = () => {
+          const fb = document.getElementById("feedback");
+          const ni = parseNum(state.formValues.ni);
+          const div = parseNum(state.formValues.div);
+          const tsAdj = parseNum(state.formValues.tsAdj);
+          const endRE = parseNum(state.formValues.endRE);
+          if ([ni, div, tsAdj, endRE].some(x => isNaN(x))) {
+            fb.className = "feedback warn show";
+            fb.innerHTML = "Please fill in all fields.";
+            return;
+          }
+          state.attempts += 1;
+          if (ni === step.expected.ni && div === step.expected.div && tsAdj === step.expected.tsAdj && endRE === step.expected.endRE) {
+            state.correctAttempts += 1;
+            const pts = state.hintShown ? 125 : 160;
+            state.score += pts;
+            fb.className = "feedback ok show";
+            fb.innerHTML = `<strong>Statement Verified! (+${pts} pts)</strong>`;
+            advanceStep();
+          } else {
+            fb.className = "feedback err show";
+            fb.innerHTML = "Check dividends declared ($740,000), the Nov. 25 treasury stock adjustment ($16,000), and ending retained earnings.";
+            updateHeader();
+          }
+        };
+      } else if (step.type === "eq_custom") {
+        step.fields.forEach(f => {
+          document.getElementById(`eq-${f.key}`).addEventListener("input", e => { state.formValues[f.key] = e.target.value; });
+        });
+        document.getElementById("btn-check-eq").onclick = () => {
+          const fb = document.getElementById("feedback");
+          const vals = step.fields.map(f => parseNum(state.formValues[f.key]));
+          if (vals.some(x => isNaN(x))) {
+            fb.className = "feedback warn show";
+            fb.innerHTML = "Please enter numbers in every line.";
+            return;
+          }
+          state.attempts += 1;
+          const ok = step.fields.every((f, i) => vals[i] === f.expected);
+          if (ok) {
+            state.correctAttempts += 1;
+            const pts = state.hintShown ? 135 : 175;
+            state.score += pts;
+            fb.className = "feedback ok show";
+            fb.innerHTML = `<strong>Stockholders' Equity Verified! (+${pts} pts)</strong>`;
+            advanceStep();
+          } else {
+            fb.className = "feedback err show";
+            fb.innerHTML = "One or more equity lines do not match. Double-check par/stated values, paid-in capital, and treasury stock.";
+            updateHeader();
+          }
+        };
+      }
+    }
+
+    function advanceStep() {
+      const sc = currentScenario();
+      setTimeout(() => {
+        state.hintShown = false;
+        state.formValues = {};
+        state.rows = [
+          { side: "Debit", account: ACCOUNTS[0], amount: "" },
+          { side: "Credit", account: ACCOUNTS[0], amount: "" }
+        ];
+        if (state.stepIndex + 1 < sc.steps.length) {
+          state.stepIndex += 1;
+        } else {
+          state.screen = "certificate";
+        }
+        render();
+      }, 800);
+    }
+
+    function renderCertificate(container) {
+      const sc = currentScenario();
+      const acc = state.attempts === 0 ? 100 : Math.round((state.correctAttempts / state.attempts) * 100);
+      const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+      container.innerHTML = `
+        <div class="certificate">
+          <div class="cert-seal">${ICONS.award}</div>
+          <div class="cert-org">Utica University • ACC 201 Financial Accounting</div>
+          <div class="cert-title">Certificate of Group Achievement</div>
+          <p class="muted" style="margin:4px 0 0;">Awarded to</p>
+          <div class="cert-group">${state.teamName || "Group 1"}</div>
+          <p style="max-width:620px;margin:10px auto 0;font-size:0.98rem;">
+            For successfully completing <strong>Level ${sc.levelNum}: ${sc.title}</strong> in the ACC 201 Stockholders' Equity Group Challenge.
+          </p>
+
+          <div class="cert-metrics">
+            <div class="cert-metric-box"><div class="lbl">Final Score</div><div class="val">${state.score} pts</div></div>
+            <div class="cert-metric-box"><div class="lbl">Accuracy</div><div class="val">${acc}%</div></div>
+            <div class="cert-metric-box"><div class="lbl">Hints Used</div><div class="val">${state.hintsUsed}</div></div>
+            <div class="cert-metric-box"><div class="lbl">Date Completed</div><div class="val">${today}</div></div>
+          </div>
+
+          <p class="muted" style="margin-top:12px;font-size:0.84rem;">
+            Take a screenshot or print this certificate for ACC 201 class credit.
+          </p>
+        </div>
+
+        <div class="actions no-print" style="justify-content:center;margin-top:18px;">
+          <button class="btn-blue" onclick="window.print()">Print / Save PDF</button>
+          <button class="btn-primary" id="btn-back-home">Choose Another Level</button>
+        </div>
+      `;
+
+      document.getElementById("btn-back-home").onclick = () => {
+        state.screen = "home";
+        render();
+      };
+    }
+
+    render();
+  </script>
+</body>
+</html>
